@@ -1,0 +1,1500 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>BlockTek Radio - Technical Whitepaper</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap');
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Inter', sans-serif;
+            line-height: 1.6;
+            color: #1a1a1a;
+            background: #ffffff;
+        }
+        
+        .page {
+            width: 210mm;
+            min-height: 297mm;
+            margin: 0 auto;
+            padding: 20mm;
+            background: white;
+            box-shadow: 0 0 20px rgba(0,0,0,0.1);
+            page-break-after: always;
+            position: relative;
+        }
+        
+        .page:last-child {
+            page-break-after: avoid;
+        }
+        
+        /* Cover Page */
+        .cover-page {
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            text-align: center;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+        }
+        
+        .cover-page h1 {
+            font-size: 48px;
+            font-weight: 800;
+            margin-bottom: 20px;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+        }
+        
+        .cover-page .subtitle {
+            font-size: 24px;
+            font-weight: 300;
+            margin-bottom: 40px;
+            opacity: 0.9;
+        }
+        
+        .cover-page .version {
+            font-size: 16px;
+            margin-bottom: 60px;
+            opacity: 0.8;
+        }
+        
+        .cover-page .authors {
+            font-size: 18px;
+            margin-bottom: 20px;
+        }
+        
+        .cover-page .date {
+            font-size: 16px;
+            opacity: 0.8;
+        }
+        
+        /* Headers */
+        h1 {
+            font-size: 32px;
+            font-weight: 700;
+            color: #2d3748;
+            margin-bottom: 30px;
+            border-bottom: 3px solid #667eea;
+            padding-bottom: 10px;
+        }
+        
+        h2 {
+            font-size: 24px;
+            font-weight: 600;
+            color: #4a5568;
+            margin: 30px 0 20px 0;
+        }
+        
+        h3 {
+            font-size: 20px;
+            font-weight: 500;
+            color: #2d3748;
+            margin: 25px 0 15px 0;
+        }
+        
+        h4 {
+            font-size: 16px;
+            font-weight: 500;
+            color: #4a5568;
+            margin: 20px 0 10px 0;
+        }
+        
+        /* Text */
+        p {
+            margin-bottom: 15px;
+            text-align: justify;
+            font-size: 14px;
+            line-height: 1.7;
+        }
+        
+        /* Lists */
+        ul, ol {
+            margin: 15px 0 15px 30px;
+        }
+        
+        li {
+            margin-bottom: 8px;
+            font-size: 14px;
+            line-height: 1.6;
+        }
+        
+        /* Tables */
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 20px 0;
+            font-size: 13px;
+        }
+        
+        th, td {
+            border: 1px solid #e2e8f0;
+            padding: 12px;
+            text-align: left;
+        }
+        
+        th {
+            background: #f7fafc;
+            font-weight: 600;
+            color: #2d3748;
+        }
+        
+        /* Flowchart Styles */
+        .flowchart {
+            margin: 30px 0;
+            text-align: center;
+        }
+        
+        .flowchart-container {
+            background: #f8f9fa;
+            border: 2px solid #e9ecef;
+            border-radius: 10px;
+            padding: 30px;
+            margin: 20px 0;
+        }
+        
+        .flow-box {
+            display: inline-block;
+            background: #667eea;
+            color: white;
+            padding: 15px 25px;
+            border-radius: 8px;
+            margin: 10px;
+            font-weight: 500;
+            font-size: 13px;
+            min-width: 120px;
+            text-align: center;
+        }
+        
+        .flow-box.user {
+            background: #48bb78;
+        }
+        
+        .flow-box.blockchain {
+            background: #ed8936;
+        }
+        
+        .flow-box.storage {
+            background: #9f7aea;
+        }
+        
+        .flow-box.ai {
+            background: #38b2ac;
+        }
+        
+        .flow-arrow {
+            font-size: 20px;
+            color: #667eea;
+            margin: 0 10px;
+        }
+        
+        .flow-row {
+            margin: 20px 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            flex-wrap: wrap;
+        }
+        
+        /* Architecture Diagram */
+        .arch-layer {
+            background: #f1f5f9;
+            border: 2px solid #cbd5e0;
+            border-radius: 8px;
+            padding: 20px;
+            margin: 15px 0;
+            text-align: center;
+        }
+        
+        .arch-layer h4 {
+            color: #2d3748;
+            margin-bottom: 15px;
+            font-size: 16px;
+        }
+        
+        .arch-components {
+            display: flex;
+            justify-content: space-around;
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+        
+        .arch-component {
+            background: white;
+            border: 1px solid #e2e8f0;
+            border-radius: 6px;
+            padding: 10px 15px;
+            font-size: 12px;
+            font-weight: 500;
+            color: #4a5568;
+            min-width: 100px;
+        }
+        
+        /* Timeline */
+        .timeline {
+            position: relative;
+            margin: 30px 0;
+        }
+        
+        .timeline::before {
+            content: '';
+            position: absolute;
+            left: 30px;
+            top: 0;
+            bottom: 0;
+            width: 2px;
+            background: #667eea;
+        }
+        
+        .timeline-item {
+            position: relative;
+            margin: 30px 0;
+            padding-left: 70px;
+        }
+        
+        .timeline-item::before {
+            content: '';
+            position: absolute;
+            left: 24px;
+            top: 5px;
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            background: #667eea;
+        }
+        
+        .timeline-quarter {
+            font-weight: 600;
+            color: #667eea;
+            font-size: 16px;
+            margin-bottom: 5px;
+        }
+        
+        .timeline-title {
+            font-weight: 500;
+            color: #2d3748;
+            margin-bottom: 8px;
+        }
+        
+        .timeline-desc {
+            font-size: 13px;
+            color: #4a5568;
+            line-height: 1.5;
+        }
+        
+        /* Page Numbers */
+        .page-number {
+            position: absolute;
+            bottom: 15mm;
+            right: 20mm;
+            font-size: 12px;
+            color: #718096;
+        }
+        
+        /* Print Styles */
+        @media print {
+            body {
+                margin: 0;
+                padding: 0;
+            }
+            
+            .page {
+                margin: 0;
+                box-shadow: none;
+                page-break-after: always;
+            }
+            
+            .page:last-child {
+                page-break-after: avoid;
+            }
+        }
+        
+        /* Highlight Boxes */
+        .highlight-box {
+            background: #edf2f7;
+            border-left: 4px solid #667eea;
+            padding: 20px;
+            margin: 20px 0;
+            border-radius: 0 8px 8px 0;
+        }
+        
+        .highlight-box h4 {
+            color: #667eea;
+            margin-top: 0;
+        }
+        
+        /* Statistics */
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 20px;
+            margin: 20px 0;
+        }
+        
+        .stat-item {
+            text-align: center;
+            background: #f7fafc;
+            padding: 20px;
+            border-radius: 8px;
+            border: 1px solid #e2e8f0;
+        }
+        
+        .stat-number {
+            font-size: 24px;
+            font-weight: 700;
+            color: #667eea;
+            display: block;
+        }
+        
+        .stat-label {
+            font-size: 12px;
+            color: #4a5568;
+            margin-top: 5px;
+        }
+    </style>
+</head>
+<body>
+    <!-- Cover Page -->
+    <div class="page cover-page">
+        <h1>BlockTek Radio</h1>
+        <div class="subtitle">Decentralized Internet Radio Platform</div>
+        <div class="version">Technical Whitepaper v1.0</div>
+        <div class="authors">
+            <strong>Stanslaus Munyasia</strong> - Co-Founder & CEO<br>
+            <strong>Wycliffe Osano</strong> - Co-Founder & BD<br>
+            <strong>Caleb Jephuneh</strong> - Co-Founder & CTO
+        </div>
+        <div class="date">January 2025</div>
+    </div>
+
+    <!-- Page 1: Executive Summary -->
+    <div class="page">
+        <h1>Executive Summary</h1>
+        
+        <p>BlockTek Radio represents a paradigm shift in internet radio broadcasting, leveraging blockchain technology to create the world's first truly decentralized audio streaming platform. By combining Web3 infrastructure with advanced AI voice processing, we're building an ecosystem where creators own their content, listeners earn rewards, and communities thrive through token-gated experiences.</p>
+
+        <h2>Vision Statement</h2>
+        <p>To democratize audio content creation and distribution through blockchain technology, empowering creators with true ownership while rewarding active community participation in a decentralized audio ecosystem.</p>
+
+        <h2>Key Innovation Areas</h2>
+        <ul>
+            <li><strong>Decentralized Broadcasting:</strong> Peer-to-peer audio streaming without centralized control</li>
+            <li><strong>NFT Integration:</strong> Audio content as tradeable digital assets with royalty mechanisms</li>
+            <li><strong>Token Economics:</strong> Reward-based ecosystem incentivizing quality content and engagement</li>
+            <li><strong>AI Voice Stack:</strong> Advanced audio processing for professional-quality streaming</li>
+            <li><strong>Community Governance:</strong> Decentralized decision-making through token-based voting</li>
+        </ul>
+
+        <h2>Market Opportunity</h2>
+        <div class="stats-grid">
+            <div class="stat-item">
+                <span class="stat-number">$23.5B</span>
+                <div class="stat-label">Global Audio Streaming Market</div>
+            </div>
+            <div class="stat-item">
+                <span class="stat-number">2.8B</span>
+                <div class="stat-label">Podcast Listeners Worldwide</div>
+            </div>
+            <div class="stat-item">
+                <span class="stat-number">$67B</span>
+                <div class="stat-label">NFT Market Size (2024)</div>
+            </div>
+            <div class="stat-item">
+                <span class="stat-number">420M</span>
+                <div class="stat-label">Web3 Users Globally</div>
+            </div>
+        </div>
+
+        <h2>Competitive Advantages</h2>
+        <ul>
+            <li><strong>First-Mover Advantage:</strong> Pioneer in decentralized radio broadcasting</li>
+            <li><strong>Multi-Chain Support:</strong> Deployment across Ethereum, Polygon, Arbitrum, and CoreDAO</li>
+            <li><strong>Creator-First Economy:</strong> Direct monetization without platform fees</li>
+            <li><strong>AI-Enhanced Experience:</strong> Real-time voice processing and content optimization</li>
+            <li><strong>Community Ownership:</strong> Token holders participate in platform governance</li>
+        </ul>
+
+        <div class="highlight-box">
+            <h4>Investment Thesis</h4>
+            <p>BlockTek Radio addresses the $23.5B audio streaming market with a decentralized approach that eliminates intermediaries, reduces costs, and creates new revenue streams for creators. Our platform combines the growing trends of Web3 adoption, NFT utility, and creator economy monetization into a single, cohesive ecosystem.</p>
+        </div>
+
+        <div class="page-number">1</div>
+    </div>
+
+    <!-- Page 2: Problem Statement & Solution -->
+    <div class="page">
+        <h1>Problem Statement & Solution</h1>
+
+        <h2>Current Industry Challenges</h2>
+
+        <h3>1. Centralized Control & Censorship</h3>
+        <p>Traditional radio platforms maintain centralized control over content distribution, leading to arbitrary censorship, demonetization, and creator dependency on platform policies. Content creators have no ownership rights and can lose their audience overnight due to policy changes.</p>
+
+        <h3>2. Unfair Revenue Distribution</h3>
+        <p>Existing platforms take 30-50% of creator revenue through platform fees, advertising revenue sharing, and subscription cuts. Creators struggle to monetize their content effectively while platforms capture the majority of value generated.</p>
+
+        <h3>3. Limited Monetization Options</h3>
+        <p>Current monetization models rely heavily on advertising revenue and subscription fees, providing limited options for creators to generate income. There's no mechanism for direct fan support or content ownership transfer.</p>
+
+        <h3>4. Lack of Community Engagement</h3>
+        <p>Traditional platforms offer minimal community features, with no incentive mechanisms for listener engagement or content discovery. Audiences are passive consumers rather than active community participants.</p>
+
+        <h2>BlockTek Radio Solution</h2>
+
+        <div class="flowchart-container">
+            <h3>Solution Architecture Overview</h3>
+            <div class="flow-row">
+                <div class="flow-box user">Content Creator</div>
+                <span class="flow-arrow">→</span>
+                <div class="flow-box">Upload to IPFS</div>
+                <span class="flow-arrow">→</span>
+                <div class="flow-box blockchain">Mint NFT</div>
+            </div>
+            <div class="flow-row">
+                <span class="flow-arrow">↓</span>
+            </div>
+            <div class="flow-row">
+                <div class="flow-box">Decentralized Broadcasting</div>
+                <span class="flow-arrow">→</span>
+                <div class="flow-box user">Global Audience</div>
+                <span class="flow-arrow">→</span>
+                <div class="flow-box">Earn BTK Tokens</div>
+            </div>
+        </div>
+
+        <h3>Key Solution Components</h3>
+
+        <h4>Decentralized Infrastructure</h4>
+        <ul>
+            <li>IPFS-based content storage ensuring permanent availability</li>
+            <li>Blockchain-secured ownership and transaction records</li>
+            <li>Peer-to-peer streaming reducing bandwidth costs</li>
+            <li>Multi-chain deployment for scalability and cost optimization</li>
+        </ul>
+
+        <h4>Creator Empowerment</h4>
+        <ul>
+            <li>100% creator ownership of content through NFT minting</li>
+            <li>Direct monetization without platform intermediaries</li>
+            <li>Customizable royalty structures for secondary sales</li>
+            <li>Community-driven content discovery and promotion</li>
+        </ul>
+
+        <h4>Token-Based Economy</h4>
+        <ul>
+            <li>BTK tokens reward listening, creating, and community participation</li>
+            <li>Token-gated content access creating premium experiences</li>
+            <li>Governance tokens enabling community decision-making</li>
+            <li>Staking mechanisms for platform revenue sharing</li>
+        </ul>
+
+        <h4>AI-Enhanced Experience</h4>
+        <ul>
+            <li>Real-time noise cancellation and voice enhancement</li>
+            <li>Automated content transcription and translation</li>
+            <li>Intelligent content recommendation algorithms</li>
+            <li>Voice synthesis for accessibility features</li>
+        </ul>
+
+        <div class="page-number">2</div>
+    </div>
+
+    <!-- Page 3: Technical Architecture -->
+    <div class="page">
+        <h1>Technical Architecture</h1>
+
+        <h2>System Architecture Overview</h2>
+
+        <div class="arch-layer">
+            <h4>Frontend Layer</h4>
+            <div class="arch-components">
+                <div class="arch-component">React Web App</div>
+                <div class="arch-component">Mobile Apps (iOS/Android)</div>
+                <div class="arch-component">Desktop Client</div>
+                <div class="arch-component">Web3 Wallet Integration</div>
+            </div>
+        </div>
+
+        <div class="arch-layer">
+            <h4>API & Services Layer</h4>
+            <div class="arch-components">
+                <div class="arch-component">REST API Gateway</div>
+                <div class="arch-component">WebSocket Streaming</div>
+                <div class="arch-component">Authentication Service</div>
+                <div class="arch-component">Analytics Engine</div>
+            </div>
+        </div>
+
+        <div class="arch-layer">
+            <h4>Blockchain Layer</h4>
+            <div class="arch-components">
+                <div class="arch-component">Smart Contracts</div>
+                <div class="arch-component">Multi-Chain Bridge</div>
+                <div class="arch-component">Token Management</div>
+                <div class="arch-component">NFT Marketplace</div>
+            </div>
+        </div>
+
+        <div class="arch-layer">
+            <h4>Storage & Infrastructure</h4>
+            <div class="arch-components">
+                <div class="arch-component">IPFS Network</div>
+                <div class="arch-component">CDN Distribution</div>
+                <div class="arch-component">Database Cluster</div>
+                <div class="arch-component">AI Processing</div>
+            </div>
+        </div>
+
+        <h2>Core Technology Stack</h2>
+
+        <table>
+            <tr>
+                <th>Component</th>
+                <th>Technology</th>
+                <th>Purpose</th>
+            </tr>
+            <tr>
+                <td>Frontend</td>
+                <td>React 18, TypeScript, Tailwind CSS</td>
+                <td>User interface and experience</td>
+            </tr>
+            <tr>
+                <td>Backend</td>
+                <td>Node.js, Express, Socket.IO</td>
+                <td>API services and real-time communication</td>
+            </tr>
+            <tr>
+                <td>Blockchain</td>
+                <td>Solidity, Hardhat, OpenZeppelin</td>
+                <td>Smart contract development and deployment</td>
+            </tr>
+            <tr>
+                <td>Web3 Integration</td>
+                <td>Wagmi, Viem, Ethers.js</td>
+                <td>Blockchain interaction and wallet connectivity</td>
+            </tr>
+            <tr>
+                <td>Storage</td>
+                <td>IPFS, Infura, PostgreSQL</td>
+                <td>Decentralized and traditional data storage</td>
+            </tr>
+            <tr>
+                <td>AI/ML</td>
+                <td>TensorFlow.js, WebRTC, Web Audio API</td>
+                <td>Voice processing and content analysis</td>
+            </tr>
+        </table>
+
+        <h2>Smart Contract Architecture</h2>
+
+        <h3>BlockTekToken (BTK) Contract</h3>
+        <ul>
+            <li>ERC-20 compliant utility token</li>
+            <li>Reward distribution mechanisms</li>
+            <li>Governance voting capabilities</li>
+            <li>Staking and yield farming functions</li>
+        </ul>
+
+        <h3>BlockTekNFT Contract</h3>
+        <ul>
+            <li>ERC-721 compliant audio NFTs</li>
+            <li>Royalty management (EIP-2981)</li>
+            <li>Metadata storage on IPFS</li>
+            <li>Creator verification system</li>
+        </ul>
+
+        <h3>AccessControl Contract</h3>
+        <ul>
+            <li>Token-gated content management</li>
+            <li>Tier-based access control</li>
+            <li>Dynamic pricing mechanisms</li>
+            <li>Community governance integration</li>
+        </ul>
+
+        <div class="page-number">3</div>
+    </div>
+
+    <!-- Page 4: Detailed System Flow -->
+    <div class="page">
+        <h1>Detailed System Flow</h1>
+
+        <h2>Content Creation & Distribution Flow</h2>
+
+        <div class="flowchart-container">
+            <div class="flow-row">
+                <div class="flow-box user">Creator Records Audio</div>
+                <span class="flow-arrow">→</span>
+                <div class="flow-box ai">AI Processing & Enhancement</div>
+            </div>
+            <div class="flow-row">
+                <span class="flow-arrow">↓</span>
+            </div>
+            <div class="flow-row">
+                <div class="flow-box storage">Upload to IPFS</div>
+                <span class="flow-arrow">→</span>
+                <div class="flow-box">Generate Metadata</div>
+            </div>
+            <div class="flow-row">
+                <span class="flow-arrow">↓</span>
+            </div>
+            <div class="flow-row">
+                <div class="flow-box blockchain">Deploy Smart Contract</div>
+                <span class="flow-arrow">→</span>
+                <div class="flow-box blockchain">Mint NFT</div>
+            </div>
+            <div class="flow-row">
+                <span class="flow-arrow">↓</span>
+            </div>
+            <div class="flow-row">
+                <div class="flow-box">List on Marketplace</div>
+                <span class="flow-arrow">→</span>
+                <div class="flow-box user">Available to Listeners</div>
+            </div>
+        </div>
+
+        <h2>Live Streaming Architecture</h2>
+
+        <div class="flowchart-container">
+            <div class="flow-row">
+                <div class="flow-box user">Broadcaster</div>
+                <span class="flow-arrow">→</span>
+                <div class="flow-box ai">Real-time AI Processing</div>
+                <span class="flow-arrow">→</span>
+                <div class="flow-box">WebRTC Streaming</div>
+            </div>
+            <div class="flow-row">
+                <span class="flow-arrow">↓</span>
+            </div>
+            <div class="flow-row">
+                <div class="flow-box">CDN Distribution</div>
+                <span class="flow-arrow">→</span>
+                <div class="flow-box user">Global Listeners</div>
+                <span class="flow-arrow">→</span>
+                <div class="flow-box">Engagement Tracking</div>
+            </div>
+            <div class="flow-row">
+                <span class="flow-arrow">↓</span>
+            </div>
+            <div class="flow-row">
+                <div class="flow-box blockchain">Token Rewards</div>
+                <span class="flow-arrow">→</span>
+                <div class="flow-box">Analytics & Insights</div>
+            </div>
+        </div>
+
+        <h2>Token Economy Flow</h2>
+
+        <h3>Earning Mechanisms</h3>
+        <table>
+            <tr>
+                <th>Activity</th>
+                <th>BTK Reward</th>
+                <th>Frequency</th>
+                <th>Requirements</th>
+            </tr>
+            <tr>
+                <td>Listening (per hour)</td>
+                <td>10 BTK</td>
+                <td>Continuous</td>
+                <td>Active engagement</td>
+            </tr>
+            <tr>
+                <td>Content Creation</td>
+                <td>50-500 BTK</td>
+                <td>Per upload</td>
+                <td>Quality threshold</td>
+            </tr>
+            <tr>
+                <td>Live Broadcasting</td>
+                <td>100 BTK/hour</td>
+                <td>Real-time</td>
+                <td>Minimum listeners</td>
+            </tr>
+            <tr>
+                <td>Community Moderation</td>
+                <td>25 BTK</td>
+                <td>Per action</td>
+                <td>Verified moderator</td>
+            </tr>
+            <tr>
+                <td>Referral Program</td>
+                <td>200 BTK</td>
+                <td>Per referral</td>
+                <td>Active user signup</td>
+            </tr>
+        </table>
+
+        <h3>Spending Mechanisms</h3>
+        <ul>
+            <li><strong>Premium Content Access:</strong> 50-1000 BTK per content piece</li>
+            <li><strong>Creator Tips:</strong> Variable amounts set by users</li>
+            <li><strong>NFT Purchases:</strong> Market-determined pricing</li>
+            <li><strong>Platform Governance:</strong> Voting power proportional to holdings</li>
+            <li><strong>Advertising Boost:</strong> Promote content for wider reach</li>
+        </ul>
+
+        <h2>Security & Privacy Framework</h2>
+
+        <h3>Data Protection</h3>
+        <ul>
+            <li>End-to-end encryption for sensitive communications</li>
+            <li>Zero-knowledge proofs for privacy-preserving verification</li>
+            <li>GDPR and CCPA compliance for user data handling</li>
+            <li>Decentralized identity management</li>
+        </ul>
+
+        <h3>Smart Contract Security</h3>
+        <ul>
+            <li>Multi-signature wallet controls for critical functions</li>
+            <li>Time-locked upgrades with community approval</li>
+            <li>Regular security audits by third-party firms</li>
+            <li>Bug bounty programs for vulnerability discovery</li>
+        </ul>
+
+        <div class="page-number">4</div>
+    </div>
+
+    <!-- Page 5: AI Voice Stack & Technology -->
+    <div class="page">
+        <h1>AI Voice Stack & Technology</h1>
+
+        <h2>Advanced Audio Processing Pipeline</h2>
+
+        <div class="flowchart-container">
+            <div class="flow-row">
+                <div class="flow-box user">Raw Audio Input</div>
+                <span class="flow-arrow">→</span>
+                <div class="flow-box ai">Noise Reduction</div>
+                <span class="flow-arrow">→</span>
+                <div class="flow-box ai">Voice Enhancement</div>
+            </div>
+            <div class="flow-row">
+                <span class="flow-arrow">↓</span>
+            </div>
+            <div class="flow-row">
+                <div class="flow-box ai">Real-time Transcription</div>
+                <span class="flow-arrow">→</span>
+                <div class="flow-box ai">Language Detection</div>
+                <span class="flow-arrow">→</span>
+                <div class="flow-box ai">Translation Engine</div>
+            </div>
+            <div class="flow-row">
+                <span class="flow-arrow">↓</span>
+            </div>
+            <div class="flow-row">
+                <div class="flow-box ai">Content Analysis</div>
+                <span class="flow-arrow">→</span>
+                <div class="flow-box ai">Quality Optimization</div>
+                <span class="flow-arrow">→</span>
+                <div class="flow-box">Enhanced Output</div>
+            </div>
+        </div>
+
+        <h2>Core AI Features</h2>
+
+        <h3>1. Intelligent Noise Cancellation</h3>
+        <ul>
+            <li><strong>Deep Learning Models:</strong> Trained on millions of audio samples for superior noise identification</li>
+            <li><strong>Real-time Processing:</strong> Sub-20ms latency for live streaming applications</li>
+            <li><strong>Adaptive Algorithms:</strong> Continuously learning from user environments</li>
+            <li><strong>Multi-frequency Analysis:</strong> Targeting specific noise patterns and frequencies</li>
+        </ul>
+
+        <h3>2. Voice Enhancement & Optimization</h3>
+        <ul>
+            <li><strong>Dynamic Range Compression:</strong> Automatic volume leveling for consistent audio</li>
+            <li><strong>Frequency Equalization:</strong> AI-driven EQ adjustments for optimal clarity</li>
+            <li><strong>Vocal Isolation:</strong> Separating voice from background music or ambient sounds</li>
+            <li><strong>Breath Reduction:</strong> Minimizing distracting breathing sounds</li>
+        </ul>
+
+        <h3>3. Real-time Language Processing</h3>
+        <ul>
+            <li><strong>Speech-to-Text:</strong> 95%+ accuracy across 50+ languages</li>
+            <li><strong>Live Translation:</strong> Real-time translation for global accessibility</li>
+            <li><strong>Sentiment Analysis:</strong> Understanding emotional context and tone</li>
+            <li><strong>Content Moderation:</strong> Automatic detection of inappropriate content</li>
+        </ul>
+
+        <h2>Technical Implementation</h2>
+
+        <h3>Machine Learning Architecture</h3>
+        <table>
+            <tr>
+                <th>Component</th>
+                <th>Technology</th>
+                <th>Performance</th>
+            </tr>
+            <tr>
+                <td>Noise Reduction</td>
+                <td>Convolutional Neural Networks</td>
+                <td>15dB+ noise reduction</td>
+            </tr>
+            <tr>
+                <td>Voice Enhancement</td>
+                <td>Generative Adversarial Networks</td>
+                <td>40% clarity improvement</td>
+            </tr>
+            <tr>
+                <td>Speech Recognition</td>
+                <td>Transformer Models</td>
+                <td>95%+ accuracy rate</td>
+            </tr>
+            <tr>
+                <td>Translation</td>
+                <td>Neural Machine Translation</td>
+                <td>50+ language pairs</td>
+            </tr>
+        </table>
+
+        <h3>Edge Computing Integration</h3>
+        <ul>
+            <li><strong>Client-side Processing:</strong> Reducing server load and improving latency</li>
+            <li><strong>WebAssembly Optimization:</strong> High-performance audio processing in browsers</li>
+            <li><strong>Progressive Enhancement:</strong> Graceful degradation for lower-end devices</li>
+            <li><strong>Offline Capabilities:</strong> Basic processing available without internet connection</li>
+        </ul>
+
+        <h2>Accessibility Features</h2>
+
+        <h3>Inclusive Design Principles</h3>
+        <ul>
+            <li><strong>Hearing Impaired Support:</strong> Real-time captions and visual audio indicators</li>
+            <li><strong>Voice Synthesis:</strong> Text-to-speech for visually impaired users</li>
+            <li><strong>Multi-language Support:</strong> Global accessibility through translation</li>
+            <li><strong>Cognitive Accessibility:</strong> Simplified interfaces and clear navigation</li>
+        </ul>
+
+        <div class="highlight-box">
+            <h4>Innovation Spotlight: Adaptive Audio Intelligence</h4>
+            <p>Our proprietary Adaptive Audio Intelligence (AAI) system learns from each user's listening preferences, environmental conditions, and device capabilities to provide personalized audio optimization. This creates a unique listening experience tailored to individual needs while maintaining broadcast quality for all participants.</p>
+        </div>
+
+        <div class="page-number">5</div>
+    </div>
+
+    <!-- Page 6: Tokenomics & Economic Model -->
+    <div class="page">
+        <h1>Tokenomics & Economic Model</h1>
+
+        <h2>BTK Token Distribution</h2>
+
+        <div class="stats-grid">
+            <div class="stat-item">
+                <span class="stat-number">1B</span>
+                <div class="stat-label">Total Supply</div>
+            </div>
+            <div class="stat-item">
+                <span class="stat-number">100M</span>
+                <div class="stat-label">Initial Circulation</div>
+            </div>
+            <div class="stat-item">
+                <span class="stat-number">10%</span>
+                <div class="stat-label">Annual Inflation Cap</div>
+            </div>
+            <div class="stat-item">
+                <span class="stat-number">5%</span>
+                <div class="stat-label">Burn Rate Target</div>
+            </div>
+        </div>
+
+        <h2>Token Allocation Breakdown</h2>
+
+        <table>
+            <tr>
+                <th>Allocation</th>
+                <th>Percentage</th>
+                <th>Tokens</th>
+                <th>Vesting Schedule</th>
+            </tr>
+            <tr>
+                <td>Community Rewards</td>
+                <td>40%</td>
+                <td>400M BTK</td>
+                <td>Released over 5 years</td>
+            </tr>
+            <tr>
+                <td>Team & Advisors</td>
+                <td>20%</td>
+                <td>200M BTK</td>
+                <td>4-year vesting, 1-year cliff</td>
+            </tr>
+            <tr>
+                <td>Development Fund</td>
+                <td>15%</td>
+                <td>150M BTK</td>
+                <td>Released as needed for development</td>
+            </tr>
+            <tr>
+                <td>Strategic Partnerships</td>
+                <td>10%</td>
+                <td>100M BTK</td>
+                <td>Milestone-based release</td>
+            </tr>
+            <tr>
+                <td>Public Sale</td>
+                <td>8%</td>
+                <td>80M BTK</td>
+                <td>Immediate circulation</td>
+            </tr>
+            <tr>
+                <td>Liquidity Provision</td>
+                <td>5%</td>
+                <td>50M BTK</td>
+                <td>Locked for 2 years</td>
+            </tr>
+            <tr>
+                <td>Reserve Fund</td>
+                <td>2%</td>
+                <td>20M BTK</td>
+                <td>Emergency use only</td>
+            </tr>
+        </table>
+
+        <h2>Economic Incentive Mechanisms</h2>
+
+        <h3>Creator Economy</h3>
+        <ul>
+            <li><strong>Content Monetization:</strong> Direct sales, subscriptions, and tip mechanisms</li>
+            <li><strong>Royalty Streams:</strong> Ongoing revenue from NFT secondary sales</li>
+            <li><strong>Engagement Rewards:</strong> Tokens for high-quality, popular content</li>
+            <li><strong>Creator Funds:</strong> Grants for promising creators and innovative content</li>
+        </ul>
+
+        <h3>Listener Incentives</h3>
+        <ul>
+            <li><strong>Listening Rewards:</strong> Tokens earned for active engagement</li>
+            <li><strong>Discovery Bonuses:</strong> Extra rewards for finding new creators</li>
+            <li><strong>Community Participation:</strong> Tokens for reviews, ratings, and discussions</li>
+            <li><strong>Referral Programs:</strong> Rewards for bringing new users to the platform</li>
+        </ul>
+
+        <h3>Governance Participation</h3>
+        <ul>
+            <li><strong>Voting Rights:</strong> Token holders vote on platform decisions</li>
+            <li><strong>Proposal Submission:</strong> Stake tokens to submit governance proposals</li>
+            <li><strong>Delegation System:</strong> Delegate voting power to trusted community members</li>
+            <li><strong>Governance Rewards:</strong> Incentives for active participation in governance</li>
+        </ul>
+
+        <h2>Value Accrual Mechanisms</h2>
+
+        <h3>Token Utility</h3>
+        <ul>
+            <li><strong>Platform Access:</strong> Premium features require token holdings</li>
+            <li><strong>Transaction Medium:</strong> Primary currency for all platform transactions</li>
+            <li><strong>Staking Rewards:</strong> Earn yield by staking tokens</li>
+            <li><strong>Governance Power:</strong> Voting weight proportional to token holdings</li>
+        </ul>
+
+        <h3>Deflationary Mechanisms</h3>
+        <ul>
+            <li><strong>Transaction Burns:</strong> 2% of all transactions burned permanently</li>
+            <li><strong>NFT Minting Fees:</strong> Portion of minting fees burned</li>
+            <li><strong>Premium Feature Burns:</strong> Tokens burned for exclusive features</li>
+            <li><strong>Buyback Programs:</strong> Platform revenue used for token buybacks</li>
+        </ul>
+
+        <div class="highlight-box">
+            <h4>Sustainable Economics</h4>
+            <p>Our tokenomics model is designed for long-term sustainability, balancing inflation through community rewards with deflationary mechanisms. The system creates positive feedback loops where increased platform usage leads to higher token value, which attracts more users and creators, further increasing utility and demand.</p>
+        </div>
+
+        <div class="page-number">6</div>
+    </div>
+
+    <!-- Page 7: Governance & Community -->
+    <div class="page">
+        <h1>Governance & Community</h1>
+
+        <h2>Decentralized Autonomous Organization (DAO)</h2>
+
+        <p>BlockTek Radio will transition to a fully decentralized governance model through the establishment of the BlockTek DAO, empowering token holders to make critical decisions about the platform's future development and operations.</p>
+
+        <h3>Governance Structure</h3>
+
+        <div class="flowchart-container">
+            <div class="flow-row">
+                <div class="flow-box user">BTK Token Holders</div>
+                <span class="flow-arrow">→</span>
+                <div class="flow-box">Proposal Submission</div>
+            </div>
+            <div class="flow-row">
+                <span class="flow-arrow">↓</span>
+            </div>
+            <div class="flow-row">
+                <div class="flow-box">Community Discussion</div>
+                <span class="flow-arrow">→</span>
+                <div class="flow-box">Voting Period</div>
+            </div>
+            <div class="flow-row">
+                <span class="flow-arrow">↓</span>
+            </div>
+            <div class="flow-row">
+                <div class="flow-box blockchain">On-chain Execution</div>
+                <span class="flow-arrow">→</span>
+                <div class="flow-box">Implementation</div>
+            </div>
+        </div>
+
+        <h3>Governance Categories</h3>
+
+        <table>
+            <tr>
+                <th>Category</th>
+                <th>Minimum Stake</th>
+                <th>Voting Period</th>
+                <th>Quorum Required</th>
+            </tr>
+            <tr>
+                <td>Protocol Upgrades</td>
+                <td>100,000 BTK</td>
+                <td>7 days</td>
+                <td>15% of total supply</td>
+            </tr>
+            <tr>
+                <td>Economic Parameters</td>
+                <td>50,000 BTK</td>
+                <td>5 days</td>
+                <td>10% of total supply</td>
+            </tr>
+            <tr>
+                <td>Feature Proposals</td>
+                <td>25,000 BTK</td>
+                <td>3 days</td>
+                <td>5% of total supply</td>
+            </tr>
+            <tr>
+                <td>Community Initiatives</td>
+                <td>10,000 BTK</td>
+                <td>3 days</td>
+                <td>3% of total supply</td>
+            </tr>
+        </table>
+
+        <h2>Community Roles & Responsibilities</h2>
+
+        <h3>Core Contributors</h3>
+        <ul>
+            <li><strong>Development Team:</strong> Core protocol development and maintenance</li>
+            <li><strong>Community Managers:</strong> Facilitating discussions and onboarding</li>
+            <li><strong>Content Moderators:</strong> Ensuring platform quality and safety</li>
+            <li><strong>Technical Advisors:</strong> Providing expertise on complex decisions</li>
+        </ul>
+
+        <h3>Community Committees</h3>
+        <ul>
+            <li><strong>Technical Committee:</strong> Reviewing and approving technical proposals</li>
+            <li><strong>Economics Committee:</strong> Managing tokenomics and incentive structures</li>
+            <li><strong>Content Committee:</strong> Establishing content guidelines and policies</li>
+            <li><strong>Partnership Committee:</strong> Evaluating and managing strategic partnerships</li>
+        </ul>
+
+        <h2>Community Growth Strategy</h2>
+
+        <h3>Phase 1: Foundation Building (Q2-Q3 2025)</h3>
+        <ul>
+            <li>Establish core community channels (Discord, Telegram, Twitter)</li>
+            <li>Launch ambassador program with early adopters</li>
+            <li>Create comprehensive documentation and tutorials</li>
+            <li>Host regular AMA sessions with the founding team</li>
+        </ul>
+
+        <h3>Phase 2: Ecosystem Expansion (Q4 2025-Q1 2026)</h3>
+        <ul>
+            <li>Launch creator incubator program</li>
+            <li>Establish regional community chapters</li>
+            <li>Implement community-driven content curation</li>
+            <li>Begin transition to decentralized governance</li>
+        </ul>
+
+        <h3>Phase 3: Full Decentralization (Q2 2026+)</h3>
+        <ul>
+            <li>Complete DAO transition with full governance rights</li>
+            <li>Launch community-funded development grants</li>
+            <li>Establish self-sustaining ecosystem economics</li>
+            <li>Enable community-driven platform evolution</li>
+        </ul>
+
+        <h2>Incentive Alignment</h2>
+
+        <h3>Long-term Value Creation</h3>
+        <ul>
+            <li><strong>Vesting Schedules:</strong> Ensuring long-term commitment from all stakeholders</li>
+            <li><strong>Performance Metrics:</strong> Tying rewards to platform growth and adoption</li>
+            <li><strong>Community Ownership:</strong> Gradual transfer of control to token holders</li>
+            <li><strong>Sustainable Economics:</strong> Balancing growth with long-term viability</li>
+        </ul>
+
+        <div class="highlight-box">
+            <h4>Community-First Approach</h4>
+            <p>Our governance model prioritizes community input and decentralized decision-making. By gradually transferring control to token holders, we ensure that BlockTek Radio evolves according to the needs and desires of its users, creating a truly community-owned platform.</p>
+        </div>
+
+        <div class="page-number">7</div>
+    </div>
+
+    <!-- Page 8: Roadmap & Development Timeline -->
+    <div class="page">
+        <h1>Roadmap & Development Timeline</h1>
+
+        <h2>Strategic Development Phases</h2>
+
+        <div class="timeline">
+            <div class="timeline-item">
+                <div class="timeline-quarter">Q2 2025</div>
+                <div class="timeline-title">Foundation & Infrastructure Development</div>
+                <div class="timeline-desc">
+                    Complete technical architecture design, develop core blockchain infrastructure, build smart contract foundation, create development environment setup, establish security protocols and auditing, form strategic partnerships and advisory board.
+                </div>
+            </div>
+
+            <div class="timeline-item">
+                <div class="timeline-quarter">Q3 2025</div>
+                <div class="timeline-title">MVP Launch & Core Features</div>
+                <div class="timeline-desc">
+                    Launch MVP with basic streaming functionality, deploy smart contracts on testnet, implement NFT minting capabilities, launch live audio spaces feature, onboard first 100 creators and 1,000 users, launch community Discord and social channels.
+                </div>
+            </div>
+
+            <div class="timeline-item">
+                <div class="timeline-quarter">Q4 2025</div>
+                <div class="timeline-title">Advanced Features & Community Building</div>
+                <div class="timeline-desc">
+                    Deploy on Ethereum mainnet, implement token reward system, launch creator monetization tools, integrate AI voice enhancement, advanced analytics dashboard, partnership with major Web3 projects.
+                </div>
+            </div>
+
+            <div class="timeline-item">
+                <div class="timeline-quarter">Q1 2026</div>
+                <div class="timeline-title">Multi-Chain & Mobile Expansion</div>
+                <div class="timeline-desc">
+                    Multi-chain deployment (Polygon, Arbitrum), iOS and Android app development begins, educational content marketplace, governance token launch, cross-platform content syndication, reach 10,000+ active users milestone.
+                </div>
+            </div>
+
+            <div class="timeline-item">
+                <div class="timeline-quarter">Q2 2026</div>
+                <div class="timeline-title">Enterprise Solutions & Global Reach</div>
+                <div class="timeline-desc">
+                    Mobile app launch (iOS & Android), enterprise API for businesses, international market expansion, advanced AI features (translation, transcription), virtual concert hosting platform, creator fund establishment.
+                </div>
+            </div>
+
+            <div class="timeline-item">
+                <div class="timeline-quarter">Q3 2026</div>
+                <div class="timeline-title">Ecosystem Maturation & Innovation</div>
+                <div class="timeline-desc">
+                    Layer 2 scaling solutions implementation, decentralized governance implementation, third-party developer SDK release, advanced monetization features, AI-powered content creation tools, 100,000+ users milestone achievement.
+                </div>
+            </div>
+
+            <div class="timeline-item">
+                <div class="timeline-quarter">Q4 2026</div>
+                <div class="timeline-title">Platform Evolution & Future Vision</div>
+                <div class="timeline-desc">
+                    Metaverse integration capabilities, advanced DAO governance structure, global creator economy platform, next-generation audio technologies, strategic acquisition opportunities, IPO preparation and market evaluation.
+                </div>
+            </div>
+        </div>
+
+        <h2>Technical Milestones</h2>
+
+        <table>
+            <tr>
+                <th>Milestone</th>
+                <th>Target Date</th>
+                <th>Success Metrics</th>
+            </tr>
+            <tr>
+                <td>Smart Contract Deployment</td>
+                <td>Q3 2025</td>
+                <td>Mainnet deployment, security audit completion</td>
+            </tr>
+            <tr>
+                <td>Mobile App Launch</td>
+                <td>Q2 2026</td>
+                <td>iOS/Android app store approval, 10K+ downloads</td>
+            </tr>
+            <tr>
+                <td>Multi-Chain Integration</td>
+                <td>Q1 2026</td>
+                <td>3+ blockchain networks supported</td>
+            </tr>
+            <tr>
+                <td>AI Voice Stack</td>
+                <td>Q4 2025</td>
+                <td>Real-time processing, 95%+ accuracy</td>
+            </tr>
+            <tr>
+                <td>DAO Governance</td>
+                <td>Q3 2026</td>
+                <td>Community-controlled governance active</td>
+            </tr>
+        </table>
+
+        <div class="page-number">8</div>
+    </div>
+
+    <!-- Page 9: Future Initiatives & Innovation -->
+    <div class="page">
+        <h1>Future Initiatives & Innovation</h1>
+
+        <h2>Next-Generation Features</h2>
+
+        <h3>1. Metaverse Integration</h3>
+        <ul>
+            <li><strong>Virtual Concert Venues:</strong> 3D spaces for immersive audio experiences</li>
+            <li><strong>Avatar-based Interactions:</strong> Visual representation in virtual spaces</li>
+            <li><strong>Spatial Audio Technology:</strong> 3D positional audio for realistic experiences</li>
+            <li><strong>Cross-Platform Compatibility:</strong> Integration with major metaverse platforms</li>
+        </ul>
+
+        <h3>2. Advanced AI Capabilities</h3>
+        <ul>
+            <li><strong>Content Generation:</strong> AI-assisted music and podcast creation</li>
+            <li><strong>Personalized Recommendations:</strong> Machine learning-driven content discovery</li>
+            <li><strong>Real-time Collaboration:</strong> AI-facilitated multi-creator sessions</li>
+            <li><strong>Automated Moderation:</strong> Intelligent content filtering and community management</li>
+        </ul>
+
+        <h3>3. Cross-Chain Interoperability</h3>
+        <ul>
+            <li><strong>Universal NFT Standards:</strong> Cross-chain NFT compatibility</li>
+            <li><strong>Multi-Chain Governance:</strong> Unified voting across different networks</li>
+            <li><strong>Liquidity Bridging:</strong> Seamless token transfers between chains</li>
+            <li><strong>Scalability Solutions:</strong> Layer 2 and sidechain implementations</li>
+        </ul>
+
+        <h2>Strategic Partnerships & Integrations</h2>
+
+        <h3>Technology Partners</h3>
+        <ul>
+            <li><strong>Blockchain Infrastructure:</strong> Partnerships with major blockchain networks</li>
+            <li><strong>AI/ML Providers:</strong> Collaboration with leading AI research institutions</li>
+            <li><strong>Cloud Services:</strong> Strategic alliances with cloud computing providers</li>
+            <li><strong>Hardware Manufacturers:</strong> Integration with audio equipment companies</li>
+        </ul>
+
+        <h3>Content & Media Partners</h3>
+        <ul>
+            <li><strong>Record Labels:</strong> Partnerships for exclusive content distribution</li>
+            <li><strong>Podcast Networks:</strong> Integration with existing podcast ecosystems</li>
+            <li><strong>Educational Institutions:</strong> Collaboration on educational content</li>
+            <li><strong>Media Companies:</strong> Cross-promotion and content syndication</li>
+        </ul>
+
+        <h2>Research & Development Focus Areas</h2>
+
+        <h3>Audio Technology Innovation</h3>
+        <ul>
+            <li><strong>Quantum Audio Processing:</strong> Exploring quantum computing for audio enhancement</li>
+            <li><strong>Neural Audio Synthesis:</strong> Advanced AI-generated audio content</li>
+            <li><strong>Biometric Audio Analysis:</strong> Emotion and health monitoring through voice</li>
+            <li><strong>Holographic Audio:</strong> Next-generation spatial audio experiences</li>
+        </ul>
+
+        <h3>Blockchain Advancement</h3>
+        <ul>
+            <li><strong>Zero-Knowledge Proofs:</strong> Enhanced privacy and scalability</li>
+            <li><strong>Quantum-Resistant Cryptography:</strong> Future-proofing security measures</li>
+            <li><strong>Decentralized Storage:</strong> Advanced IPFS and distributed storage solutions</li>
+            <li><strong>Consensus Mechanisms:</strong> Energy-efficient blockchain protocols</li>
+        </ul>
+
+        <h2>Global Expansion Strategy</h2>
+
+        <h3>Regional Market Entry</h3>
+        <table>
+            <tr>
+                <th>Region</th>
+                <th>Timeline</th>
+                <th>Key Features</th>
+                <th>Local Partnerships</th>
+            </tr>
+            <tr>
+                <td>North America</td>
+                <td>Q3 2025</td>
+                <td>English content, USD pricing</td>
+                <td>Major podcast networks</td>
+            </tr>
+            <tr>
+                <td>Europe</td>
+                <td>Q4 2025</td>
+                <td>Multi-language support, GDPR compliance</td>
+                <td>European broadcasters</td>
+            </tr>
+            <tr>
+                <td>Asia-Pacific</td>
+                <td>Q1 2026</td>
+                <td>Local language AI, regional content</td>
+                <td>Asian tech companies</td>
+            </tr>
+            <tr>
+                <td>Latin America</td>
+                <td>Q2 2026</td>
+                <td>Spanish/Portuguese support</td>
+                <td>Regional media companies</td>
+            </tr>
+        </table>
+
+        <h3>Regulatory Compliance</h3>
+        <ul>
+            <li><strong>Global Standards:</strong> Compliance with international broadcasting regulations</li>
+            <li><strong>Data Protection:</strong> GDPR, CCPA, and regional privacy law compliance</li>
+            <li><strong>Financial Regulations:</strong> Cryptocurrency and securities law adherence</li>
+            <li><strong>Content Guidelines:</strong> Regional content moderation and cultural sensitivity</li>
+        </ul>
+
+        <div class="highlight-box">
+            <h4>Innovation Pipeline</h4>
+            <p>Our research and development efforts focus on staying at the forefront of audio technology, blockchain innovation, and user experience design. We maintain partnerships with leading universities and research institutions to ensure BlockTek Radio continues to pioneer new technologies in the decentralized audio space.</p>
+        </div>
+
+        <div class="page-number">9</div>
+    </div>
+
+    <!-- Page 10: Conclusion & Call to Action -->
+    <div class="page">
+        <h1>Conclusion & Call to Action</h1>
+
+        <h2>Transforming the Audio Landscape</h2>
+
+        <p>BlockTek Radio represents more than just a technological advancement; it embodies a fundamental shift toward a more equitable, decentralized, and community-driven audio ecosystem. By combining cutting-edge blockchain technology with advanced AI processing, we're creating a platform that empowers creators, rewards listeners, and builds sustainable communities around shared audio experiences.</p>
+
+        <h2>Key Value Propositions</h2>
+
+        <h3>For Creators</h3>
+        <ul>
+            <li><strong>True Ownership:</strong> Retain full rights to your content through NFT technology</li>
+            <li><strong>Direct Monetization:</strong> Eliminate intermediaries and maximize revenue</li>
+            <li><strong>Global Reach:</strong> Access worldwide audiences without geographical restrictions</li>
+            <li><strong>Community Building:</strong> Develop loyal followings through token-based incentives</li>
+        </ul>
+
+        <h3>For Listeners</h3>
+        <ul>
+            <li><strong>Reward Participation:</strong> Earn tokens for active engagement and listening</li>
+            <li><strong>Premium Experiences:</strong> Access exclusive content through token holdings</li>
+            <li><strong>Community Governance:</strong> Participate in platform decisions and development</li>
+            <li><strong>Enhanced Quality:</strong> Benefit from AI-powered audio optimization</li>
+        </ul>
+
+        <h3>For Investors</h3>
+        <ul>
+            <li><strong>Market Opportunity:</strong> First-mover advantage in $23.5B audio streaming market</li>
+            <li><strong>Sustainable Economics:</strong> Deflationary tokenomics with multiple value accrual mechanisms</li>
+            <li><strong>Scalable Technology:</strong> Multi-chain architecture supporting global expansion</li>
+            <li><strong>Strong Team:</strong> Experienced founders with proven track records in blockchain and media</li>
+        </ul>
+
+        <h2>Investment Opportunity</h2>
+
+        <div class="stats-grid">
+            <div class="stat-item">
+                <span class="stat-number">$2M</span>
+                <div class="stat-label">Seed Round Target</div>
+            </div>
+            <div class="stat-item">
+                <span class="stat-number">18 months</span>
+                <div class="stat-label">Runway to Profitability</div>
+            </div>
+            <div class="stat-item">
+                <span class="stat-number">100K+</span>
+                <div class="stat-label">Users by End of 2026</div>
+            </div>
+            <div class="stat-item">
+                <span class="stat-number">$50M</span>
+                <div class="stat-label">Projected Revenue (2027)</div>
+            </div>
+        </div>
+
+        <h3>Use of Funds</h3>
+        <table>
+            <tr>
+                <th>Category</th>
+                <th>Allocation</th>
+                <th>Purpose</th>
+            </tr>
+            <tr>
+                <td>Development</td>
+                <td>40%</td>
+                <td>Core platform development, AI integration, mobile apps</td>
+            </tr>
+            <tr>
+                <td>Marketing & Growth</td>
+                <td>25%</td>
+                <td>User acquisition, creator onboarding, community building</td>
+            </tr>
+            <tr>
+                <td>Team Expansion</td>
+                <td>20%</td>
+                <td>Hiring key personnel, advisors, and contractors</td>
+            </tr>
+            <tr>
+                <td>Infrastructure</td>
+                <td>10%</td>
+                <td>Cloud services, security audits, compliance</td>
+            </tr>
+            <tr>
+                <td>Reserve</td>
+                <td>5%</td>
+                <td>Emergency fund and unexpected opportunities</td>
+            </tr>
+        </table>
+
+        <h2>Join the Revolution</h2>
+
+        <p>The future of audio is decentralized, community-owned, and creator-empowered. BlockTek Radio is leading this transformation, and we invite you to be part of this revolutionary journey.</p>
+
+        <h3>How to Get Involved</h3>
+        <ul>
+            <li><strong>Investors:</strong> Contact our team for investment opportunities and detailed financial projections</li>
+            <li><strong>Creators:</strong> Join our early creator program and help shape the platform's development</li>
+            <li><strong>Developers:</strong> Contribute to our open-source ecosystem and earn development grants</li>
+            <li><strong>Community:</strong> Follow our social channels and participate in governance discussions</li>
+        </ul>
+
+        <h3>Contact Information</h3>
+        <ul>
+            <li><strong>Email:</strong> hello@blocktekradio.com</li>
+            <li><strong>Website:</strong> https://blocktekradio.netlify.app</li>
+            <li><strong>Twitter:</strong> @BlockTekRadio</li>
+            <li><strong>Discord:</strong> BlockTek Radio Community</li>
+        </ul>
+
+        <div class="highlight-box">
+            <h4>The Time is Now</h4>
+            <p>The convergence of blockchain technology, AI advancement, and creator economy growth creates a unique opportunity to revolutionize the audio industry. BlockTek Radio is positioned to capture this moment and build the infrastructure for the next generation of audio experiences. Join us in creating a more equitable, innovative, and community-driven future for audio content.</p>
+        </div>
+
+        <div style="text-align: center; margin-top: 40px;">
+            <p style="font-size: 18px; font-weight: 600; color: #667eea;">
+                Together, we're building the future of decentralized audio.
+            </p>
+        </div>
+
+        <div class="page-number">10</div>
+    </div>
+
+    <script>
+        // Add download functionality
+        function downloadPDF() {
+            window.print();
+        }
+        
+        // Auto-generate table of contents
+        document.addEventListener('DOMContentLoaded', function() {
+            console.log('BlockTek Radio Whitepaper loaded successfully');
+        });
+    </script>
+</body>
+</html>
