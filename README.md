@@ -256,4 +256,4 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 
 **Built with ❤️ for the Web3 community**
 
-*BlockTek Radio - Where Blockchain Meets Audio*
+*BlockTekRadio - Where Blockchain Meets Audio*
