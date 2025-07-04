@@ -1,4 +1,4 @@
-# BlockTek Radio - Blockchain Internet Radio Platform MVP
+# BlockTek Radio - Blockchain Internet Radio Platform 
 
 A comprehensive Web3-powered internet radio platform that combines audio streaming, NFT minting, token rewards, and educational content in a beautiful, modern interface.
 
@@ -8,14 +8,14 @@ A comprehensive Web3-powered internet radio platform that combines audio streami
 - **Web3 Wallet Integration**: Connect with MetaMask, WalletConnect, and other major wallets
 - **Live Radio Streaming**: High-quality audio streaming with modern player controls
 - **NFT Music Minting**: Create and mint audio NFTs with royalty management
-- **Token Rewards System**: Earn BTK tokens for listening and creating content
+- **Token Rewards System**: Earn BTR tokens for listening and creating content
 - **Token-Gated Content**: Premium content accessible via NFT/token ownership
 - **Live Crypto Prices**: Real-time cryptocurrency market data
 - **Educational Hub**: Curated Web3 learning content with access controls
 
 ### Smart Contracts
-- **BlockTekToken (BTK)**: ERC-20 reward token with listening/creator incentives
-- **BlockTekNFT**: ERC-721 music NFT contract with royalty support
+- **BlockTekRadio Tokens (BTR)**: ERC-20 reward token with listening/creator incentives
+- **BlockTekRadio NFT**: ERC-721 music NFT contract with royalty support
 - **AccessControl**: Token-gated content management system
 
 ### Technical Stack
