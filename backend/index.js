@@ -9,7 +9,7 @@ const app = express();
 // CORS configuration for Vercel
 app.use(cors({
   origin: process.env.NODE_ENV === 'production' 
-    ? ['https://your-frontend-domain.vercel.app', 'https://blocktek-radio.vercel.app']
+    ? ['https://blocktek-radio-v1.vercel.app', 'https://blocktek-radio.vercel.app', 'https://your-frontend-domain.vercel.app']
     : ['http://localhost:3000', 'http://localhost:5173'],
   credentials: true,
   methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS']

@@ -25,7 +25,7 @@ const BackgroundRadioPlayer: React.FC = () => {
   const socketRef = useRef<Socket | null>(null);
 
   useEffect(() => {
-    const backendUrl = import.meta.env.VITE_BACKEND_URL || 'http://localhost:5001';
+    const backendUrl = import.meta.env.VITE_BACKEND_URL || 'https://blocktek-radio-v1.vercel.app';
     
     // Connect to backend
     socketRef.current = io(backendUrl, {
