@@ -21,7 +21,14 @@ const io = socketIo(server, {
 const PORT = process.env.PORT || 5001;
 
 // Initialize database
-initializeDatabase().catch(console.error);
+initializeDatabase()
+  .then(() => {
+    // Auto-start background stream when server starts
+    setTimeout(() => {
+      startDefaultBackgroundStream();
+    }, 2000); // Wait 2 seconds for everything to initialize
+  })
+  .catch(console.error);
 
 // Middleware
 app.use(cors({
@@ -446,7 +453,39 @@ app.post('/api/admin/background-stream/stop', authenticateAdmin, (req, res) => {
   res.json({ success: true, message: 'Background stream stopped' });
 });
 
-// Background stream management functions
+// Auto-start default background stream function
+function startDefaultBackgroundStream() {
+  console.log('Checking for default background stream...');
+  
+  // Only start if no stream is currently active
+  if (!backgroundStreamActive) {
+    db.get('SELECT * FROM tracks WHERE is_active = 1 ORDER BY RANDOM() LIMIT 1', (err, track) => {
+      if (!err && track) {
+        const defaultScheduleItem = {
+          id: Date.now(),
+          trackId: track.id,
+          track: {
+            id: track.id,
+            title: track.title,
+            artist: track.artist,
+            filename: track.filename,
+            duration: track.duration
+          },
+          duration: 999999, // Continuous mode
+          startTime: new Date(),
+          isActive: true
+        };
+        
+        console.log('Auto-starting default background stream:', track.title);
+        startBackgroundStream(defaultScheduleItem);
+      } else {
+        console.log('No tracks available for default background stream');
+      }
+    });
+  }
+}
+
+// Enhanced background stream management functions
 function startBackgroundStream(scheduleItem) {
   currentBackgroundTrack = scheduleItem.track;
   backgroundStreamActive = true;
@@ -456,20 +495,24 @@ function startBackgroundStream(scheduleItem) {
     clearTimeout(backgroundStreamTimer);
   }
   
-  // Notify all clients
+  // Notify all clients immediately
+  console.log(`Background stream started: ${currentBackgroundTrack.title} for ${scheduleItem.duration} minutes`);
   io.emit('backgroundStreamChanged', currentBackgroundTrack);
   io.emit('backgroundStreamStateChanged', { isPlaying: true });
   
-  console.log(`Background stream started: ${currentBackgroundTrack.title} for ${scheduleItem.duration} minutes`);
-  
-  // Only set timer if duration is reasonable (not continuous mode)
-  if (scheduleItem.duration < 999999) {
-    // Set timer for next track
+  // For continuous streams (999999+ duration), set up auto-restart with next track
+  if (scheduleItem.duration >= 999999) {
+    console.log('Continuous background stream mode activated - will cycle tracks every 5 minutes');
+    
+    // Set timer to change to next track every 5 minutes for variety
     backgroundStreamTimer = setTimeout(() => {
-      // Mark current schedule item as completed
+      cycleToContinuousNextTrack();
+    }, 5 * 60 * 1000); // 5 minutes
+  } else {
+    // Original timed stream logic
+    backgroundStreamTimer = setTimeout(() => {
       scheduleItem.isActive = false;
       
-      // Get next random track for continuous playback
       db.get('SELECT * FROM tracks WHERE is_active = 1 ORDER BY RANDOM() LIMIT 1', (err, track) => {
         if (!err && track) {
           const continuousItem = {
@@ -482,7 +525,7 @@ function startBackgroundStream(scheduleItem) {
               filename: track.filename,
               duration: track.duration
             },
-            duration: scheduleItem.duration,
+            duration: 999999, // Switch to continuous mode
             startTime: new Date(),
             isActive: true
           };
@@ -491,54 +534,60 @@ function startBackgroundStream(scheduleItem) {
           stopBackgroundStream();
         }
       });
-    }, scheduleItem.duration * 60 * 1000); // Convert minutes to milliseconds
-  } else {
-    // Continuous mode - no timer, will loop indefinitely
-    console.log('Continuous background stream mode activated');
+    }, scheduleItem.duration * 60 * 1000);
   }
 }
 
-function stopBackgroundStream() {
-  backgroundStreamActive = false;
-  currentBackgroundTrack = null;
+// New function to cycle to next track in continuous mode
+function cycleToContinuousNextTrack() {
+  console.log('Cycling to next track in continuous mode...');
   
-  if (backgroundStreamTimer) {
-    clearTimeout(backgroundStreamTimer);
-    backgroundStreamTimer = null;
-  }
-  
-  io.emit('backgroundStreamChanged', null);
-  io.emit('backgroundStreamStateChanged', { isPlaying: false });
-  
-  console.log('Background stream stopped');
-}
-
-// Auto-start background stream if tracks available (improved)
-setInterval(() => {
-  if (!backgroundStreamActive) {
-    db.get('SELECT * FROM tracks WHERE is_active = 1 ORDER BY RANDOM() LIMIT 1', (err, track) => {
-      if (!err && track) {
-        const autoScheduleItem = {
+  db.get(`
+    SELECT * FROM tracks 
+    WHERE is_active = 1 AND id != ? 
+    ORDER BY RANDOM() LIMIT 1
+  `, [currentBackgroundTrack?.id || 0], (err, track) => {
+    if (!err && track) {
+      const nextScheduleItem = {
+        id: Date.now(),
+        trackId: track.id,
+        track: {
+          id: track.id,
+          title: track.title,
+          artist: track.artist,
+          filename: track.filename,
+          duration: track.duration
+        },
+        duration: 999999, // Keep continuous mode
+        startTime: new Date(),
+        isActive: true
+      };
+      
+      startBackgroundStream(nextScheduleItem);
+    } else {
+      // If no other tracks, restart current track
+      if (currentBackgroundTrack) {
+        const restartItem = {
           id: Date.now(),
-          trackId: track.id,
-          track: {
-            id: track.id,
-            title: track.title,
-            artist: track.artist,
-            filename: track.filename,
-            duration: track.duration
-          },
-          duration: 30, // 30 minutes default
+          trackId: currentBackgroundTrack.id,
+          track: currentBackgroundTrack,
+          duration: 999999,
           startTime: new Date(),
           isActive: true
         };
-        
-        console.log('Auto-starting background stream:', track.title);
-        startBackgroundStream(autoScheduleItem);
+        startBackgroundStream(restartItem);
       }
-    });
+    }
+  });
+}
+
+// Enhanced auto-restart mechanism - check every 30 seconds
+setInterval(() => {
+  if (!backgroundStreamActive) {
+    console.log('Background stream inactive, restarting...');
+    startDefaultBackgroundStream();
   }
-}, 60000); // Check every minute
+}, 30000); // Check every 30 seconds
 
 // Updated streaming endpoints
 app.post('/api/stream/play/:id', (req, res) => {
