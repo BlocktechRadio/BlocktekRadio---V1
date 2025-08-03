@@ -59,7 +59,7 @@ const Admin = () => {
   const loadTracks = async () => {
     try {
       // Remove auth header for reading playlist - it's public data
-      const response = await fetch('http://localhost:5001/api/admin/playlist');
+      const response = await fetch('https://blocktek-radio-v1.vercel.app/api/admin/playlist');
       const data = await response.json();
       setTracks(data);
     } catch (error) {
@@ -69,7 +69,7 @@ const Admin = () => {
 
   const loadUsers = async () => {
     try {
-      const response = await fetch('http://localhost:5001/api/admin/users', {
+      const response = await fetch('https://blocktek-radio-v1.vercel.app/api/admin/users', {
         headers: {
           'Authorization': `Bearer ${adminToken}`,
         },
@@ -90,7 +90,7 @@ const Admin = () => {
     const formData = new FormData(e.currentTarget);
     
     try {
-      const response = await fetch('http://localhost:5001/api/admin/upload', {
+      const response = await fetch('https://blocktek-radio-v1.vercel.app/api/admin/upload', {
         method: 'POST',
         headers: {
           'Authorization': `Bearer ${adminToken}`,
@@ -119,7 +119,7 @@ const Admin = () => {
       // Validate duration (minimum 5 minutes, maximum 1440 minutes = 24 hours)
       const validDuration = Math.min(Math.max(backgroundStreamDuration, 5), 1440);
       
-      const response = await fetch('http://localhost:5001/api/admin/background-stream/schedule', {
+      const response = await fetch('https://blocktek-radio-v1.vercel.app/api/admin/background-stream/schedule', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -146,7 +146,7 @@ const Admin = () => {
 
   const startContinuousStream = async (trackId: number) => {
     try {
-      const response = await fetch('http://localhost:5001/api/admin/background-stream/schedule', {
+      const response = await fetch('https://blocktek-radio-v1.vercel.app/api/admin/background-stream/schedule', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -173,7 +173,7 @@ const Admin = () => {
 
   const stopBackgroundStream = async () => {
     try {
-      await fetch('http://localhost:5001/api/admin/background-stream/stop', {
+      await fetch('https://blocktek-radio-v1.vercel.app/api/admin/background-stream/stop', {
         method: 'POST',
         headers: {
           'Authorization': `Bearer ${adminToken}`,
@@ -187,7 +187,7 @@ const Admin = () => {
 
   const playTrack = async (trackId: number) => {
     try {
-      const response = await fetch(`http://localhost:5001/api/stream/play/${trackId}`, {
+      const response = await fetch(`https://blocktek-radio-v1.vercel.app/api/stream/play/${trackId}`, {
         method: 'POST',
       });
       const result = await response.json();
@@ -204,7 +204,7 @@ const Admin = () => {
     if (!confirm('Are you sure you want to delete this track?')) return;
 
     try {
-      const response = await fetch(`http://localhost:5001/api/admin/track/${trackId}`, {
+      const response = await fetch(`https://blocktek-radio-v1.vercel.app/api/admin/track/${trackId}`, {
         method: 'DELETE',
         headers: {
           'Authorization': `Bearer ${adminToken}`,

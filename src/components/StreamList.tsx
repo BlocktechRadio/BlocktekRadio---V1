@@ -27,7 +27,7 @@ const StreamList: React.FC = () => {
     
     // Connect to socket for real-time updates
     try {
-      socketRef.current = io('http://localhost:5001', {
+      socketRef.current = io('https://blocktek-radio-v1.vercel.app', {
         transports: ['polling', 'websocket'],
         upgrade: true,
         rememberUpgrade: false,
@@ -67,13 +67,13 @@ const StreamList: React.FC = () => {
 
   const loadTracks = async () => {
     try {
-      const response = await fetch('http://localhost:5001/api/admin/playlist');
+      const response = await fetch('https://blocktek-radio-v1.vercel.app/api/admin/playlist');
       const data = await response.json();
       console.log('Loaded tracks:', data);
       setTracks(data);
       
       // Get current playing track
-      const statusResponse = await fetch('http://localhost:5001/api/stream/status');
+      const statusResponse = await fetch('https://blocktek-radio-v1.vercel.app/api/stream/status');
       const status = await statusResponse.json();
       console.log('Stream status:', status);
       setCurrentTrack(status.currentTrack);
@@ -125,7 +125,7 @@ const StreamList: React.FC = () => {
         }
       }
       
-      const response = await fetch(`http://localhost:5001/api/stream/play/${trackId}`, {
+      const response = await fetch(`https://blocktek-radio-v1.vercel.app/api/stream/play/${trackId}`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -241,7 +241,7 @@ const StreamList: React.FC = () => {
               
               <div className="text-center">
                 <a 
-                  href="http://localhost:5001/admin" 
+                  href="https://blocktek-radio-v1.vercel.app/admin" 
                   target="_blank" 
                   rel="noopener noreferrer"
                   className="inline-flex items-center text-purple-400 hover:text-purple-300 text-sm font-medium"
