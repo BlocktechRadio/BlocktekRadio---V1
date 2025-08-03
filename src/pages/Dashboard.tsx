@@ -1,17 +1,35 @@
-import React, { useState } from 'react';
-import { useAccount } from 'wagmi';
-import { Headphones, Coins, Trophy, Music, TrendingUp, Users } from 'lucide-react';
+import React, { useState, useEffect } from 'react';
+import { useAccount, useConnect, useDisconnect } from 'wagmi';
+import { Headphones, Coins, Trophy, Music, TrendingUp, Users, Wallet, ExternalLink, Play, Clock } from 'lucide-react';
 import { motion } from 'framer-motion';
+import MusicPlayer from '../components/MusicPlayer';
+
+interface Track {
+  id: number;
+  title: string;
+  artist: string;
+  filename: string;
+  duration: number;
+  uploadedAt: string;
+  play_count: number;
+}
 
 const Dashboard = () => {
   const { address, isConnected } = useAccount();
-  const [userStats] = useState({
-    listeningHours: 127,
-    tokensEarned: 2450,
-    nftsOwned: 8,
-    rank: 42,
-    streaksDay: 15
+  const { connect, connectors } = useConnect();
+  const { disconnect } = useDisconnect();
+  
+  const [userStats, setUserStats] = useState({
+    listeningHours: 0,
+    tokensEarned: 0,
+    nftsOwned: 0,
+    rank: 0,
+    streaksDay: 0
   });
+
+  const [availableStreams, setAvailableStreams] = useState<Track[]>([]);
+  const [currentTrack, setCurrentTrack] = useState<Track | null>(null);
+  const [isLoading, setIsLoading] = useState(false);
 
   const [recentActivity] = useState([
     { type: 'listen', description: 'Listened to "DeFi Deep Dive"', time: '2 hours ago', tokens: 25 },
@@ -20,15 +38,113 @@ const Dashboard = () => {
     { type: 'listen', description: 'Listened to "NFT News Weekly"', time: '2 days ago', tokens: 30 },
   ]);
 
+  useEffect(() => {
+    if (isConnected && address) {
+      connectUser();
+      loadAvailableStreams();
+    }
+  }, [isConnected, address]);
+
+  const connectUser = async () => {
+    try {
+      const response = await fetch('http://localhost:5001/api/users/connect', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          walletAddress: address,
+          username: null,
+          email: null
+        }),
+      });
+
+      const result = await response.json();
+      if (result.success) {
+        setUserStats({
+          listeningHours: result.user.listening_hours || 0,
+          tokensEarned: result.user.tokens_earned || 0,
+          nftsOwned: result.user.nfts_owned || 0,
+          rank: result.user.rank_position || 999,
+          streaksDay: result.user.streak_days || 0
+        });
+      }
+    } catch (error) {
+      console.error('Failed to connect user:', error);
+    }
+  };
+
+  const loadAvailableStreams = async () => {
+    try {
+      const response = await fetch('http://localhost:5001/api/admin/playlist');
+      const tracks = await response.json();
+      setAvailableStreams(tracks);
+    } catch (error) {
+      console.error('Failed to load streams:', error);
+    }
+  };
+
+  const playStream = async (trackId: number) => {
+    setIsLoading(true);
+    try {
+      const response = await fetch(`http://localhost:5001/api/stream/play/${trackId}`, {
+        method: 'POST',
+      });
+      const result = await response.json();
+      
+      if (result.success) {
+        setCurrentTrack(result.track);
+        // Show success message
+        const successDiv = document.createElement('div');
+        successDiv.className = 'fixed top-20 right-4 bg-green-600 text-white px-4 py-2 rounded-lg z-50';
+        successDiv.textContent = `Now Playing: ${result.track.title}`;
+        document.body.appendChild(successDiv);
+        
+        setTimeout(() => {
+          successDiv.remove();
+        }, 3000);
+      }
+    } catch (error) {
+      console.error('Failed to play stream:', error);
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
   if (!isConnected) {
     return (
       <div className="min-h-screen flex items-center justify-center px-4">
         <div className="text-center max-w-md mx-auto">
           <h2 className="text-2xl sm:text-3xl font-bold text-white mb-4">Connect Your Wallet</h2>
-          <p className="text-gray-400 mb-8 text-sm sm:text-base">Please connect your wallet to access your dashboard</p>
+          <p className="text-gray-400 mb-8 text-sm sm:text-base">Please connect your wallet to access your dashboard and start earning tokens</p>
           <div className="bg-white/5 backdrop-blur-sm border border-purple-500/20 rounded-2xl p-6 sm:p-8">
-            <div className="text-4xl sm:text-6xl mb-4">🔒</div>
-            <p className="text-gray-300 text-sm sm:text-base">Your personalized Web3 radio experience awaits!</p>
+            <div className="text-4xl sm:text-6xl mb-6">🔒</div>
+            <p className="text-gray-300 text-sm sm:text-base mb-6">Your personalized Web3 radio experience awaits!</p>
+            
+            <div className="space-y-3">
+              {connectors.map((connector) => (
+                <button
+                  key={connector.id}
+                  onClick={() => connect({ connector })}
+                  className="w-full bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700 text-white py-3 px-6 rounded-xl font-medium transition-all flex items-center justify-center space-x-2"
+                >
+                  <Wallet className="h-5 w-5" />
+                  <span>Connect {connector.name}</span>
+                </button>
+              ))}
+            </div>
+            
+            <div className="mt-6 text-center">
+              <a 
+                href="http://localhost:5001/admin" 
+                target="_blank" 
+                rel="noopener noreferrer"
+                className="inline-flex items-center space-x-2 text-purple-400 hover:text-purple-300 text-sm"
+              >
+                <span>Admin Panel</span>
+                <ExternalLink className="h-4 w-4" />
+              </a>
+            </div>
           </div>
         </div>
       </div>
@@ -36,14 +152,38 @@ const Dashboard = () => {
   }
 
   return (
-    <div className="min-h-screen py-6 sm:py-8 px-4 sm:px-6 lg:px-8">
+    <div className="min-h-screen py-6 sm:py-8 px-4 sm:px-6 lg:px-8 pb-24 pt-8">
       <div className="max-w-7xl mx-auto">
         {/* Header */}
         <div className="mb-6 sm:mb-8">
-          <h1 className="text-2xl sm:text-3xl lg:text-4xl font-bold text-white mb-2">Dashboard</h1>
-          <p className="text-gray-400 text-sm sm:text-base">Welcome back to BlockTek Radio</p>
-          <div className="text-xs sm:text-sm text-purple-400 mt-2 font-mono">
-            {address?.slice(0, 6)}...{address?.slice(-4)}
+          <div className="flex items-center justify-between">
+            <div>
+              <h1 className="text-2xl sm:text-3xl lg:text-4xl font-bold text-white mb-2">Dashboard</h1>
+              <p className="text-gray-400 text-sm sm:text-base">Welcome back to BlockTek Radio</p>
+              <div className="text-xs sm:text-sm text-purple-400 mt-2 font-mono">
+                {address?.slice(0, 6)}...{address?.slice(-4)}
+              </div>
+            </div>
+            
+            <div className="flex items-center space-x-4">
+              <a 
+                href="http://localhost:5001/admin" 
+                target="_blank" 
+                rel="noopener noreferrer"
+                className="bg-purple-600 hover:bg-purple-700 text-white px-4 py-2 rounded-lg text-sm flex items-center space-x-2"
+              >
+                <Music className="h-4 w-4" />
+                <span>Admin Panel</span>
+                <ExternalLink className="h-4 w-4" />
+              </a>
+              
+              <button
+                onClick={() => disconnect()}
+                className="bg-red-600 hover:bg-red-700 text-white px-4 py-2 rounded-lg text-sm"
+              >
+                Disconnect
+              </button>
+            </div>
           </div>
         </div>
 
@@ -114,6 +254,91 @@ const Dashboard = () => {
             <div className="text-xs sm:text-sm text-gray-400">Day Streak</div>
           </motion.div>
         </div>
+
+        {/* Available Streams Section */}
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.6, delay: 0.8 }}
+          className="mb-6 sm:mb-8 bg-white/5 backdrop-blur-sm border border-purple-500/20 rounded-2xl p-6"
+        >
+          <h3 className="text-xl sm:text-2xl font-semibold text-white mb-6 flex items-center">
+            <Music className="h-6 w-6 mr-3 text-purple-400" />
+            Available Streams
+          </h3>
+          
+          {availableStreams.length === 0 ? (
+            <div className="text-center py-8">
+              <Music className="h-16 w-16 text-gray-500 mx-auto mb-4" />
+              <p className="text-gray-400">No streams available at the moment.</p>
+            </div>
+          ) : (
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+              {availableStreams.slice(0, 6).map((track) => (
+                <div
+                  key={track.id}
+                  className={`bg-white/5 border rounded-xl p-4 hover:bg-white/10 transition-all cursor-pointer ${
+                    currentTrack?.id === track.id ? 'border-green-500 bg-green-600/10' : 'border-purple-500/20'
+                  }`}
+                  onClick={() => playStream(track.id)}
+                >
+                  <div className="flex items-center justify-between mb-3">
+                    <div className="w-10 h-10 bg-gradient-to-br from-purple-500 to-pink-500 rounded-lg flex items-center justify-center">
+                      <Music className="h-5 w-5 text-white" />
+                    </div>
+                    <button
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        playStream(track.id);
+                      }}
+                      disabled={isLoading}
+                      className={`p-2 text-white rounded-full transition-colors ${
+                        currentTrack?.id === track.id 
+                          ? 'bg-green-600 hover:bg-green-700' 
+                          : 'bg-purple-600 hover:bg-purple-700'
+                      }`}
+                    >
+                      {isLoading ? (
+                        <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white"></div>
+                      ) : (
+                        <Play className="h-4 w-4" />
+                      )}
+                    </button>
+                  </div>
+                  
+                  <h4 className="text-white font-medium mb-1 text-sm truncate">{track.title}</h4>
+                  <p className="text-gray-400 text-xs mb-2">by {track.artist}</p>
+                  
+                  <div className="flex items-center justify-between text-xs text-gray-500">
+                    <div className="flex items-center space-x-1">
+                      <Clock className="h-3 w-3" />
+                      <span>{new Date(track.uploadedAt).toLocaleDateString()}</span>
+                    </div>
+                    <div className="flex items-center space-x-1">
+                      <Headphones className="h-3 w-3" />
+                      <span>{track.play_count || 0}</span>
+                    </div>
+                  </div>
+                  
+                  {currentTrack?.id === track.id && (
+                    <div className="mt-2 flex items-center text-green-400 text-xs">
+                      <div className="w-2 h-2 bg-green-400 rounded-full animate-pulse mr-2"></div>
+                      Now Playing
+                    </div>
+                  )}
+                </div>
+              ))}
+            </div>
+          )}
+          
+          {availableStreams.length > 6 && (
+            <div className="text-center mt-6">
+              <button className="text-purple-400 hover:text-purple-300 font-medium">
+                View All Streams ({availableStreams.length}) →
+              </button>
+            </div>
+          )}
+        </motion.div>
 
         <div className="grid grid-cols-1 xl:grid-cols-2 gap-6 sm:gap-8">
           {/* Recent Activity */}
@@ -220,6 +445,9 @@ const Dashboard = () => {
           </div>
         </motion.div>
       </div>
+      
+      {/* Music Player */}
+      <MusicPlayer />
     </div>
   );
 };
