@@ -1,3 +1,17 @@
+/**
+ * BackgroundRadioPlayer React Component
+ * 
+ * This floating player connects to the BlockTek Radio backend to:
+ * - Listen for background radio stream changes (via Socket.IO or polling)
+ * - Play/pause/mute/adjust volume for the current track
+ * - Show track info and loading/error states
+ * - Allow minimizing/closing the player
+ * 
+ * Environment variable VITE_BACKEND_URL should point to the backend API.
+ * 
+ * Usage: <BackgroundRadioPlayer />
+ */
+
 import React, { useState, useEffect, useRef } from 'react';
 import { Play, Pause, Volume2, VolumeX, X, Radio, Music } from 'lucide-react';
 import { io, Socket } from 'socket.io-client';
