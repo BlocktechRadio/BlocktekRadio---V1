@@ -47,7 +47,7 @@ const Dashboard = () => {
 
   const connectUser = async () => {
     try {
-      const response = await fetch('https://blocktek-radio-v1.vercel.app/api/users/connect', {
+      const response = await fetch('https://blocktekradio-v1.onrender.com/api/users/connect', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -76,7 +76,7 @@ const Dashboard = () => {
 
   const loadAvailableStreams = async () => {
     try {
-      const response = await fetch('https://blocktek-radio-v1.vercel.app/api/admin/playlist');
+      const response = await fetch('https://blocktekradio-v1.onrender.com/api/admin/playlist');
       const tracks = await response.json();
       setAvailableStreams(tracks);
     } catch (error) {
@@ -87,7 +87,7 @@ const Dashboard = () => {
   const playStream = async (trackId: number) => {
     setIsLoading(true);
     try {
-      const response = await fetch(`https://blocktek-radio-v1.vercel.app/api/stream/play/${trackId}`, {
+      const response = await fetch(`https://blocktekradio-v1.onrender.com/api/stream/play/${trackId}`, {
         method: 'POST',
       });
       const result = await response.json();
@@ -136,7 +136,7 @@ const Dashboard = () => {
             
             <div className="mt-6 text-center">
               <a 
-                href="https://blocktek-radio-v1.vercel.app/admin" 
+                href="https://blocktekradio-v1.onrender.com/admin" 
                 target="_blank" 
                 rel="noopener noreferrer"
                 className="inline-flex items-center space-x-2 text-purple-400 hover:text-purple-300 text-sm"
@@ -167,7 +167,7 @@ const Dashboard = () => {
             
             <div className="flex items-center space-x-4">
               <a 
-                href="https://blocktek-radio-v1.vercel.app/admin" 
+                href="https://blocktekradio-v1.onrender.com/admin" 
                 target="_blank" 
                 rel="noopener noreferrer"
                 className="bg-purple-600 hover:bg-purple-700 text-white px-4 py-2 rounded-lg text-sm flex items-center space-x-2"

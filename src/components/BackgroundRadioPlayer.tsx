@@ -14,7 +14,6 @@
 
 import React, { useState, useEffect, useRef } from 'react';
 import { Play, Pause, Volume2, VolumeX, X, Radio, Music } from 'lucide-react';
-import { io, Socket } from 'socket.io-client';
 
 interface Track {
   id: number;
@@ -22,6 +21,7 @@ interface Track {
   artist: string;
   filename: string;
   duration: number;
+  isYouTube?: boolean;
 }
 
 const BackgroundRadioPlayer: React.FC = () => {
@@ -36,99 +36,54 @@ const BackgroundRadioPlayer: React.FC = () => {
   const [error, setError] = useState<string | null>(null);
   
   const audioRef = useRef<HTMLAudioElement>(null);
-  const socketRef = useRef<Socket | null>(null);
 
   useEffect(() => {
-    const backendUrl = import.meta.env.VITE_BACKEND_URL || 'https://blocktek-radio-v1.vercel.app';
-    
-    // Connect to backend
-    socketRef.current = io(backendUrl, {
-      transports: ['polling', 'websocket'],
-      upgrade: true,
-      rememberUpgrade: false,
-      timeout: 20000,
-      forceNew: true
-    });
-    
-    // Connection handlers
-    socketRef.current.on('connect', () => {
-      console.log('Background radio socket connected');
-      setError(null);
-    });
+    const backendUrl = import.meta.env.VITE_BACKEND_URL?.replace(/\/$/, '') || 'https://blocktekradio-v1.onrender.com';
 
-    socketRef.current.on('connect_error', (error) => {
-      console.error('Background radio socket error:', error);
-      setError('Connection failed');
-    });
-    
-    // Socket event listeners for background streaming
-    socketRef.current.on('backgroundStreamChanged', (track: Track) => {
-      console.log('Background stream changed:', track);
-      setCurrentTrack(track);
-      setError(null);
-      
-      if (track && audioRef.current) {
-        setIsLoading(true);
-        const audioUrl = `${backendUrl}/api/stream/audio/${track.filename}`;
-        console.log('Loading background audio from:', audioUrl);
-        
-        audioRef.current.src = audioUrl;
-        audioRef.current.load();
-        
-        // Immediate auto-play
-        setTimeout(() => {
-          forcePlayAudio();
-        }, 500);
-      }
-    });
+    // Poll for background stream updates
+    const pollBackgroundStream = async () => {
+      try {
+        const response = await fetch(`${backendUrl}/api/background-stream/status`);
+        const data = await response.json();
 
-    socketRef.current.on('backgroundStreamStateChanged', ({ isPlaying: playing }: { isPlaying: boolean }) => {
-      console.log('Background stream state changed:', playing);
-      setIsPlaying(playing);
-      
-      if (audioRef.current && currentTrack) {
-        if (playing) {
-          forcePlayAudio();
-        } else {
-          audioRef.current.pause();
-        }
-      }
-    });
-
-    // Get initial background stream and start immediately
-    fetch(`${backendUrl}/api/background-stream/status`)
-      .then(res => res.json())
-      .then(data => {
-        console.log('Background stream status:', data);
-        if (data.currentTrack) {
+        if (data.currentTrack && (!currentTrack || data.currentTrack.id !== currentTrack.id)) {
+          console.log('Background stream changed via polling:', data.currentTrack);
           setCurrentTrack(data.currentTrack);
-          setIsPlaying(true); // Force playing state
-          
+          setError(null);
+
           if (audioRef.current) {
-            const audioUrl = `${backendUrl}/api/stream/audio/${data.currentTrack.filename}`;
+            setIsLoading(true);
+            const audioUrl = data.currentTrack.isYouTube
+              ? `${backendUrl}/api/stream/youtube/${data.currentTrack.id}`
+              : `${backendUrl}/api/stream/audio/${data.currentTrack.filename}`;
             audioRef.current.src = audioUrl;
-            audioRef.current.muted = false;
-            audioRef.current.volume = volume;
             audioRef.current.load();
-            
-            // Start immediately without delay
+
             setTimeout(() => {
               forcePlayAudio();
-            }, 200);
+            }, 500);
           }
         }
-      })
-      .catch((error) => {
-        console.error('Failed to get background stream status:', error);
-        setError('Failed to load stream');
-      });
 
-    return () => {
-      if (socketRef.current) {
-        socketRef.current.disconnect();
+        if (data.isActive !== isPlaying) {
+          setIsPlaying(data.isActive);
+        }
+      } catch (error) {
+        console.error('Polling error:', error);
+        setError('Connection failed');
       }
     };
-  }, []);
+
+    // Initial load
+    pollBackgroundStream();
+
+    // Poll every 30 seconds
+    const pollInterval = setInterval(pollBackgroundStream, 30000);
+
+    return () => {
+      clearInterval(pollInterval);
+    };
+  }, [currentTrack, isPlaying]);
 
   const forcePlayAudio = async () => {
     if (audioRef.current) {

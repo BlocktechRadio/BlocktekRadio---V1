@@ -25,7 +25,7 @@ const MusicPlayer: React.FC = () => {
 
   useEffect(() => {
     // Connect to backend with explicit configuration
-    socketRef.current = io('https://blocktek-radio-v1.vercel.app', {
+    socketRef.current = io('https://blocktekradio-v1.onrender.com', {
       transports: ['polling', 'websocket'],
       upgrade: true,
       rememberUpgrade: false,
@@ -57,7 +57,7 @@ const MusicPlayer: React.FC = () => {
       
       if (track && audioRef.current) {
         setIsLoading(true);
-        const audioUrl = `https://blocktek-radio-v1.vercel.app/api/stream/audio/${track.filename}`;
+        const audioUrl = `https://blocktekradio-v1.onrender.com/api/stream/audio/${track.filename}`;
         console.log('Loading audio from:', audioUrl);
         
         audioRef.current.src = audioUrl;
@@ -100,7 +100,7 @@ const MusicPlayer: React.FC = () => {
     });
 
     // Get initial state
-    fetch('https://blocktek-radio-v1.vercel.app/api/stream/status')
+    fetch('https://blocktekradio-v1.onrender.com/api/stream/status')
       .then(res => res.json())
       .then(data => {
         console.log('Initial state:', data);
@@ -109,7 +109,7 @@ const MusicPlayer: React.FC = () => {
         setPlaylist(data.playlist);
         
         if (data.currentTrack && audioRef.current) {
-          const audioUrl = `https://blocktek-radio-v1.vercel.app/api/stream/audio/${data.currentTrack.filename}`;
+          const audioUrl = `https://blocktekradio-v1.onrender.com/api/stream/audio/${data.currentTrack.filename}`;
           audioRef.current.src = audioUrl;
           audioRef.current.load();
           
@@ -227,11 +227,11 @@ const MusicPlayer: React.FC = () => {
         if (audioRef.current) {
           audioRef.current.pause();
         }
-        await fetch('https://blocktek-radio-v1.vercel.app/api/stream/pause', { method: 'POST' });
+        await fetch('https://blocktekradio-v1.onrender.com/api/stream/pause', { method: 'POST' });
       } else {
         // Play locally first for immediate feedback
         await playAudio();
-        await fetch('https://blocktek-radio-v1.vercel.app/api/stream/resume', { method: 'POST' });
+        await fetch('https://blocktekradio-v1.onrender.com/api/stream/resume', { method: 'POST' });
       }
     } catch (error) {
       console.error('Failed to toggle play/pause:', error);
@@ -250,7 +250,7 @@ const MusicPlayer: React.FC = () => {
         setIsPlaying(true);
         
         // Notify server
-        await fetch('https://blocktek-radio-v1.vercel.app/api/stream/resume', { method: 'POST' });
+        await fetch('https://blocktekradio-v1.onrender.com/api/stream/resume', { method: 'POST' });
       } catch (error) {
         console.error('Force play failed:', error);
         setError('Unable to play audio. Please check your browser settings.');

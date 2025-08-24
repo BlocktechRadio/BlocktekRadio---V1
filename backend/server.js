@@ -6,6 +6,7 @@ const cors = require('cors');
 const http = require('http');
 const socketIo = require('socket.io');
 const { db, initializeDatabase } = require('./database/database');
+const ytdl = require('ytdl-core'); // Add this at the top
 
 const app = express();
 const server = http.createServer(app);
@@ -704,6 +705,76 @@ app.get('/api/stream/audio/:filename', (req, res) => {
     res.writeHead(200, head);
     fs.createReadStream(filePath).pipe(res);
   }
+});
+
+// Admin endpoint to add a YouTube link to the playlist
+app.post('/api/admin/youtube-stream', authenticateAdmin, async (req, res) => {
+  const { youtubeUrl } = req.body;
+
+  if (!youtubeUrl || !ytdl.validateURL(youtubeUrl)) {
+    return res.status(400).json({ error: 'Invalid YouTube URL' });
+  }
+
+  try {
+    const info = await ytdl.getInfo(youtubeUrl);
+    const title = info.videoDetails.title;
+    const artist = info.videoDetails.author.name;
+
+    // Add the YouTube track to the playlist
+    const newTrack = {
+      id: Date.now(),
+      title,
+      artist,
+      filename: youtubeUrl, // Use the URL as the filename
+      duration: parseInt(info.videoDetails.lengthSeconds, 10),
+      uploadDate: new Date().toISOString(),
+      isActive: true,
+      isYouTube: true // Mark this track as a YouTube track
+    };
+
+    db.run(
+      'INSERT INTO tracks (title, artist, filename, duration, is_active, is_youtube) VALUES (?, ?, ?, ?, ?, ?)',
+      [title, artist, youtubeUrl, newTrack.duration, 1, 1],
+      function (err) {
+        if (err) {
+          console.error('Database error:', err);
+          return res.status(500).json({ error: 'Failed to save YouTube track to database' });
+        }
+
+        newTrack.id = this.lastID; // Use the database ID
+        io.emit('playlistUpdated'); // Notify clients about the updated playlist
+        res.json({ success: true, track: newTrack });
+      }
+    );
+  } catch (error) {
+    console.error('Failed to process YouTube URL:', error);
+    res.status(500).json({ error: 'Failed to process YouTube URL' });
+  }
+});
+
+// Stream YouTube audio
+app.get('/api/stream/youtube/:id', (req, res) => {
+  const trackId = parseInt(req.params.id);
+
+  db.get('SELECT * FROM tracks WHERE id = ? AND is_youtube = 1', [trackId], (err, track) => {
+    if (err) {
+      console.error('Database error:', err);
+      return res.status(500).json({ error: 'Database error' });
+    }
+
+    if (!track) {
+      return res.status(404).json({ error: 'YouTube track not found' });
+    }
+
+    try {
+      const stream = ytdl(track.filename, { filter: 'audioonly', quality: 'highestaudio' });
+      res.setHeader('Content-Type', 'audio/mpeg');
+      stream.pipe(res);
+    } catch (error) {
+      console.error('Failed to stream YouTube audio:', error);
+      res.status(500).json({ error: 'Failed to stream YouTube audio' });
+    }
+  });
 });
 
 // Socket.IO connection handling

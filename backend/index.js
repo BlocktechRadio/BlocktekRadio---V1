@@ -23,6 +23,8 @@
  *   DELETE /api/admin/track/:id              - Mark track as inactive (admin only)
  *   GET    /api/stream/audio/:filename       - Stream audio file (with range support)
  *   POST   /api/background-stream/next       - Switch to next track in playlist
+ *   POST   /api/admin/youtube-stream         - Add YouTube audio to playlist (admin only)
+ *   GET    /api/stream/youtube/:id           - Stream YouTube audio
  * 
  * To run locally: `NODE_ENV=development node index.js`
  * To deploy on Vercel: see vercel.json and deploy with `vercel --prod`
@@ -33,6 +35,7 @@ const cors = require('cors');
 const multer = require('multer');
 const path = require('path');
 const fs = require('fs');
+const ytdl = require('ytdl-core'); // Add this at the top
 
 const app = express();
 
@@ -173,8 +176,28 @@ app.get('/api/background-stream/status', (req, res) => {
 
 // Get playlist
 app.get('/api/admin/playlist', (req, res) => {
-  const activePlaylist = playlist.filter(track => track.isActive);
-  res.json(activePlaylist);
+  db.all(`
+    SELECT 
+      id,
+      title,
+      artist,
+      filename,
+      duration,
+      file_size,
+      upload_date as uploadedAt,
+      play_count,
+      is_active
+    FROM tracks 
+    WHERE is_active = 1 
+    ORDER BY upload_date DESC
+  `, (err, tracks) => {
+    if (err) {
+      console.error('Database error:', err);
+      return res.status(500).json({ error: 'Failed to load playlist' });
+    }
+    
+    res.json({ success: true, tracks });
+  });
 });
 
 // Upload endpoint
@@ -211,6 +234,40 @@ app.post('/api/admin/upload', authenticateAdmin, (req, res) => {
   });
 });
 
+// Admin endpoint to stream YouTube audio
+app.post('/api/admin/youtube-stream', authenticateAdmin, async (req, res) => {
+  const { youtubeUrl } = req.body;
+
+  if (!youtubeUrl || !ytdl.validateURL(youtubeUrl)) {
+    return res.status(400).json({ error: 'Invalid YouTube URL' });
+  }
+
+  try {
+    const info = await ytdl.getInfo(youtubeUrl);
+    const title = info.videoDetails.title;
+    const artist = info.videoDetails.author.name;
+
+    // Add the YouTube track to the playlist
+    const newTrack = {
+      id: Date.now(),
+      title,
+      artist,
+      filename: youtubeUrl, // Use the URL as the filename
+      duration: parseInt(info.videoDetails.lengthSeconds, 10),
+      uploadDate: new Date().toISOString(),
+      isActive: true,
+      isYouTube: true // Mark this track as a YouTube track
+    };
+
+    playlist.push(newTrack);
+
+    res.json({ success: true, track: newTrack });
+  } catch (error) {
+    console.error('Failed to process YouTube URL:', error);
+    res.status(500).json({ error: 'Failed to process YouTube URL' });
+  }
+});
+
 // Delete track endpoint
 app.delete('/api/admin/track/:id', authenticateAdmin, (req, res) => {
   const trackId = parseInt(req.params.id);
@@ -230,8 +287,12 @@ app.delete('/api/admin/track/:id', authenticateAdmin, (req, res) => {
 app.get('/api/stream/audio/:filename', (req, res) => {
   const filename = req.params.filename;
   const filePath = path.join(uploadDir, filename);
-  
+
+  console.log('Streaming audio file:', filename);
+  console.log('File path:', filePath);
+
   if (!fs.existsSync(filePath)) {
+    console.error('Audio file not found:', filePath);
     return res.status(404).json({ error: 'Audio file not found' });
   }
 
@@ -264,6 +325,25 @@ app.get('/api/stream/audio/:filename', (req, res) => {
     };
     res.writeHead(200, head);
     fs.createReadStream(filePath).pipe(res);
+  }
+});
+
+// Stream YouTube audio
+app.get('/api/stream/youtube/:id', async (req, res) => {
+  const trackId = parseInt(req.params.id);
+  const track = playlist.find(t => t.id === trackId && t.isYouTube);
+
+  if (!track) {
+    return res.status(404).json({ error: 'YouTube track not found' });
+  }
+
+  try {
+    const stream = ytdl(track.filename, { filter: 'audioonly', quality: 'highestaudio' });
+    res.setHeader('Content-Type', 'audio/mpeg');
+    stream.pipe(res);
+  } catch (error) {
+    console.error('Failed to stream YouTube audio:', error);
+    res.status(500).json({ error: 'Failed to stream YouTube audio' });
   }
 });
 

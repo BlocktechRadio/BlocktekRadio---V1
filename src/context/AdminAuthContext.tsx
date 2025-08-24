@@ -27,7 +27,7 @@ export const AdminAuthProvider: React.FC<{ children: React.ReactNode }> = ({ chi
 
   const loginAdmin = async (username: string, password: string): Promise<boolean> => {
     try {
-      const response = await fetch('http://localhost:5001/api/admin/login', {
+      const response = await fetch('https://blocktekradio-v1.onrender.com/api/admin/login', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -53,7 +53,7 @@ export const AdminAuthProvider: React.FC<{ children: React.ReactNode }> = ({ chi
 
   const logoutAdmin = async () => {
     try {
-      await fetch('http://localhost:5001/api/admin/logout', {
+      await fetch('https://blocktekradio-v1.onrender.com/api/admin/logout', {
         method: 'POST',
         headers: {
           'Authorization': `Bearer ${adminToken}`,

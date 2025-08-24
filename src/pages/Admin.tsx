@@ -39,6 +39,8 @@ const Admin = () => {
   const [isUploading, setIsUploading] = useState(false);
   const [searchTerm, setSearchTerm] = useState('');
   const [backgroundStreamDuration, setBackgroundStreamDuration] = useState(30);
+  const [youtubeUrl, setYoutubeUrl] = useState('');
+  const [youtubeMessage, setYoutubeMessage] = useState<string | null>(null);
   
   const sidebarItems = [
     { id: 'users', label: 'Connected Users', icon: Users },
@@ -59,7 +61,7 @@ const Admin = () => {
   const loadTracks = async () => {
     try {
       // Remove auth header for reading playlist - it's public data
-      const response = await fetch('https://blocktek-radio-v1.vercel.app/api/admin/playlist');
+      const response = await fetch('https://blocktekradio-v1.onrender.com/api/admin/playlist');
       const data = await response.json();
       setTracks(data);
     } catch (error) {
@@ -69,7 +71,7 @@ const Admin = () => {
 
   const loadUsers = async () => {
     try {
-      const response = await fetch('https://blocktek-radio-v1.vercel.app/api/admin/users', {
+      const response = await fetch('https://blocktekradio-v1.onrender.com/api/admin/users', {
         headers: {
           'Authorization': `Bearer ${adminToken}`,
         },
@@ -90,7 +92,7 @@ const Admin = () => {
     const formData = new FormData(e.currentTarget);
     
     try {
-      const response = await fetch('https://blocktek-radio-v1.vercel.app/api/admin/upload', {
+      const response = await fetch('https://blocktekradio-v1.onrender.com/api/admin/upload', {
         method: 'POST',
         headers: {
           'Authorization': `Bearer ${adminToken}`,
@@ -119,7 +121,7 @@ const Admin = () => {
       // Validate duration (minimum 5 minutes, maximum 1440 minutes = 24 hours)
       const validDuration = Math.min(Math.max(backgroundStreamDuration, 5), 1440);
       
-      const response = await fetch('https://blocktek-radio-v1.vercel.app/api/admin/background-stream/schedule', {
+      const response = await fetch('https://blocktekradio-v1.onrender.com/api/admin/background-stream/schedule', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -146,7 +148,7 @@ const Admin = () => {
 
   const startContinuousStream = async (trackId: number) => {
     try {
-      const response = await fetch('https://blocktek-radio-v1.vercel.app/api/admin/background-stream/schedule', {
+      const response = await fetch('https://blocktekradio-v1.onrender.com/api/admin/background-stream/schedule', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -173,7 +175,7 @@ const Admin = () => {
 
   const stopBackgroundStream = async () => {
     try {
-      await fetch('https://blocktek-radio-v1.vercel.app/api/admin/background-stream/stop', {
+      await fetch('https://blocktekradio-v1.onrender.com/api/admin/background-stream/stop', {
         method: 'POST',
         headers: {
           'Authorization': `Bearer ${adminToken}`,
@@ -187,7 +189,7 @@ const Admin = () => {
 
   const playTrack = async (trackId: number) => {
     try {
-      const response = await fetch(`https://blocktek-radio-v1.vercel.app/api/stream/play/${trackId}`, {
+      const response = await fetch(`https://blocktekradio-v1.onrender.com/api/stream/play/${trackId}`, {
         method: 'POST',
       });
       const result = await response.json();
@@ -204,7 +206,7 @@ const Admin = () => {
     if (!confirm('Are you sure you want to delete this track?')) return;
 
     try {
-      const response = await fetch(`https://blocktek-radio-v1.vercel.app/api/admin/track/${trackId}`, {
+      const response = await fetch(`https://blocktekradio-v1.onrender.com/api/admin/track/${trackId}`, {
         method: 'DELETE',
         headers: {
           'Authorization': `Bearer ${adminToken}`,
@@ -217,6 +219,37 @@ const Admin = () => {
       }
     } catch (error) {
       console.error('Failed to delete track:', error);
+    }
+  };
+
+  const handleAddYouTubeLink = async (e: React.FormEvent) => {
+    e.preventDefault();
+
+    try {
+      const response = await fetch(
+        'https://blocktekradio-v1.onrender.com/api/admin/youtube-stream',
+        {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            Authorization: `Bearer ${adminToken}`,
+          },
+          body: JSON.stringify({ youtubeUrl }),
+        }
+      );
+
+      const result = await response.json();
+
+      if (result.success) {
+        setYoutubeMessage(`YouTube track added: ${result.track.title}`);
+        setYoutubeUrl('');
+        loadTracks(); // Refresh the playlist
+      } else {
+        setYoutubeMessage(result.error || 'Failed to add YouTube track');
+      }
+    } catch (error) {
+      console.error('Failed to add YouTube track:', error);
+      setYoutubeMessage('Failed to add YouTube track');
     }
   };
 
@@ -466,6 +499,35 @@ const Admin = () => {
                       </div>
                     </div>
                   </div>
+                </div>
+
+                {/* YouTube Link Form */}
+                <div className="bg-white/5 backdrop-blur-sm border border-purple-500/20 rounded-2xl p-6">
+                  <h3 className="text-xl font-semibold text-white mb-6">Add YouTube Track</h3>
+                  <form onSubmit={handleAddYouTubeLink} className="space-y-4">
+                    <div>
+                      <label className="block text-sm font-medium text-gray-300 mb-2">
+                        YouTube URL
+                      </label>
+                      <input
+                        type="url"
+                        placeholder="Enter YouTube URL"
+                        value={youtubeUrl}
+                        onChange={(e) => setYoutubeUrl(e.target.value)}
+                        className="w-full px-4 py-3 bg-gray-800 border border-gray-600 rounded-lg text-white focus:ring-2 focus:ring-purple-500 focus:border-transparent"
+                        required
+                      />
+                    </div>
+                    <button
+                      type="submit"
+                      className="w-full bg-purple-600 hover:bg-purple-700 text-white py-3 rounded-lg font-medium transition-all"
+                    >
+                      Add YouTube Track
+                    </button>
+                  </form>
+                  {youtubeMessage && (
+                    <p className="mt-4 text-sm text-green-400">{youtubeMessage}</p>
+                  )}
                 </div>
 
                 {/* Available Tracks for Background Stream */}
