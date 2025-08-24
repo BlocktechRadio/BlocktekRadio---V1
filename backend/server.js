@@ -33,7 +33,7 @@ initializeDatabase()
 
 // Middleware
 app.use(cors({
-  origin: ["http://localhost:3000", "http://localhost:5173", "http://localhost:5174"],
+  origin: '*', // Allow requests from all origins
   methods: ["GET", "POST", "DELETE", "PUT", "PATCH", "OPTIONS"],
   allowedHeaders: ["Content-Type", "Range", "Authorization"],
   credentials: true
