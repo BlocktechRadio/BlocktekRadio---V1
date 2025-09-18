@@ -194,16 +194,16 @@ const Home = () => {
                 name: "Stanslaus Munyasia",
                 role: "Co-Founder & CEO",
                 image: "/WhatsApp Image 2025-06-28 at 11.35.53 PM.jpeg",
-                bio: "Visionary blockchain entrepreneur with extensive experience in radio technology and Web3 innovation. Previously served as Lead for Africa at Brave Browser, where he spearheaded continental expansion and conducted deep research into radio technology applications. Stan brings a unique combination of traditional media expertise and cutting-edge blockchain knowledge to revolutionize the audio industry through decentralized platforms.",
-                achievements: ["Former Lead Africa at Brave Browser", "Radio Technology Research Expert", "8+ Years in Blockchain & Fintech"],
+                bio: "Visionary blockchain entrepreneur with extensive experience in radio technology and Web3 innovation. Previously served as Africa BAT Ambassador, where he spearheaded continental expansion and conducted deep research into radio technology applications. Stan brings a unique combination of traditional media expertise and cutting-edge blockchain knowledge to revolutionize the audio industry through decentralized platforms.",
+                achievements: ["Former Africa BAT Ambassador", "Radio Technology Research Expert", "8+ Years in Blockchain & Fintech"],
                 social: { twitter: "https://x.com/stanmunyasia", linkedin: "https://www.linkedin.com/in/stanslaus-m-78381037/" }
               },
               {
                 name: "Wycliffe Osano",
                 role: "Co-Founder & BD",
                 image: "/1750709962500.jpg",
-                bio: "Strategic business development leader with a strong technical background in protocol development. Previously served as Technical Lead at CoreDAO, where he successfully onboarded over 20,000 developers to the ecosystem. Currently working with HackQuest as Developer Relations and Community Manager, Wycliffe combines deep technical expertise with exceptional community building skills to drive BlockTek's global expansion and developer ecosystem growth.",
-                achievements: ["Former Technical Lead at CoreDAO", "20,000+ Developers Onboarded", "Developer Relations Expert at HackQuest"],
+                bio: "Strategic business development leader with a strong technical background in protocol development. Previously served as Technical Lead at CoreDAO, where he successfully onboarded over 600+ developers to the ecosystem. Currently working with HackQuest as Developer Relations and Community Manager where he has helped in reviewing 2000+ global hackathon projects & shortlisting, Wycliffe combines deep technical expertise with exceptional community building skills to drive BlockTek's global expansion and developer ecosystem growth.",
+                achievements: ["Former Technical Lead at CoreDAO","Onboarded Ecosystem Partners to HackQuest", "Reviewed and helped in shortlisting over 2000+ Global Hackathon Projects", "Developer Relations at HackQuest"],
                 social: { twitter: "https://x.com/wycl34226", linkedin: "https://www.linkedin.com/in/wycliffe-osano-oyieko-742586182/" }
               },
               {
